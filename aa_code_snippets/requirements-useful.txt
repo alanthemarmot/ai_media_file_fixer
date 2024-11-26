@@ -1,0 +1,12 @@
+# General
+ipykernel
+python-dotenv
+
+# Data
+numpy
+pandas
+scikit-learn
+matplotlib
+
+# Scheduling
+prefect
