@@ -9,7 +9,7 @@ Build a local web application that allows users to batch rename torrent media fi
 Tech-savvy users with downloaded media libraries who want consistent file naming for media server compatibility (e.g., Plex, Jellyfin).
 
 **Key Goals:**
-- Search for series/movies and retrieve metadata.
+- Search for TV series/movies and retrieve metadata.
 - Select local files and map them to metadata entries.
 - Preview original vs. proposed filenames.
 - Confirm and execute renaming operations on the filesystem.
@@ -30,10 +30,10 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
   - API endpoints: search, metadata fetch, preview rename, execute rename
   - Metadata service integration (TVmaze, TMDb, etc.)
   - File system operations
-  - Validation & error handling
+  - Validation & 
+  - Error Handling: Show an eror message depending on the issue -> * API rate limits or unavailability. * No search results found. * Files are locked or in use during renaming. * Invalid file types selected. * Duplicate episode numbers in metadata or local files. * Network connectivity issues. *
+  - 
 
-- **Local Database (optional):**
-  - SQLite for caching search results and mapping history
 
 ---
 
@@ -110,18 +110,21 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 - **Development Tools:**
   - VSCode with Copilot
   - `uv` for Python environment management and dependency installation
-  - Poetry or pipenv (optional) for more advanced workflows
   - Pytest for backend tests, Jest/React Testing Library for frontend
+
+- **Installation/setup:**
+  - Shell script executable to create and start the python environment and run the Python/node code locally.
+  - Dockerized startup once the application is fully created and deployable.
 
 ---
 
 ## 6. Component Design & Data Flow
 
 1. **Search Screen**  
-   - User enters query → React calls `GET /api/search?query=` → FastAPI fetches from metadata API → returns list of matching titles.
+   - User enters query → React calls `GET /api/search?query=` → FastAPI fetches from metadata API → returns list of matching TV or Movie titles.
 
 2. **Metadata Browser**  
-   - On title select → `GET /api/series/{id}/episodes` → returns seasons & episodes.
+   - On title select → `GET /api/series/{id}/episodes` → returns the Movie or TV seasons & episodes.
 
 3. **File Picker & Mapping**  
    - User picks a directory → frontend reads filenames → displays list.  
@@ -142,6 +145,7 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 - **File Mapping Screen:** Two-column layout: “Files” and “Episodes”; drag-and-drop or auto-match.  
 - **Preview Modal:** Table of old vs. new filenames; Confirm/Cancel buttons.  
 - **Status Notifications:** Toasts for success/failure messages.
+- **All Pages:* *Should contain a return to main/home button and a back button
 
 ---
 
@@ -158,7 +162,9 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 
 ---
 
-## 9. File Renaming Logic
+## 9. File Renaming Logic & Directory Naming Logic
 
 1. **Validate** file existence and permissions.  
-2. **Generate target filename**:   S{season:02d}E{episode:02d} - {Episode Title} {File format}.{ext}
+2. **Generate target filename for TV shows/episodes**:   S{season:02d}E{episode:02d} - {Episode Title} ({File format}).{ext}
+3. **Generate target directories for TV shows/episodes**:   {Show Title} [{TV Network}]({File Format})/Season{season:02d} ({File format})
+4. **Generate target filename for Movies**:   S{Movie Title} [{Year of Release}]({File format}).{ext}
