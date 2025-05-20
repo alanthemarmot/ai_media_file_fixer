@@ -1,3 +1,5 @@
+# Copilot Instructions
+
 ## Code Elegance Guidelines
 
 ### Simplicity Principles
@@ -19,3 +21,13 @@
 - Named exports for utility functions
 - Group related hooks at the top of a component
 - Keep event handlers inside the component, but separate from the JSX
+
+### Python Setup - Use `uv` for Python Environments
+- Setting Up uv for Python Environments - https://docs.astral.sh/uv/guides/
+
+### Node.js Setup
+- Install Node.js v18.x or higher (recommend using nvm)
+- Run `npm install` in the project root to install frontend dependencies
+- Start the React development server with `npm run dev` or `yarn dev`
+- Build production-ready assets with `npm run build`
+- Scripts and commands are defined in `package.json`

@@ -3,14 +3,15 @@
 ## 1. Overview
 
 **Purpose:**  
-Build a local web application that allows users to batch rename torrent media files (TV episodes, movies) into a consistent naming convention. The app searches and fetches metadata (episode titles, numbers) from a free online API, previews the renaming, and commits changes.
+Build a local web application that allows users to batch rename torrent media files (TV episodes, movies) into a consistent naming convention. The app searches and fetches metadata (movie/episode titles, numbers, year of release) from a free online API, previews the renaming, and commits changes.
 
 **Target Audience:**  
 Tech-savvy users with downloaded media libraries who want consistent file naming for media server compatibility (e.g., Plex, Jellyfin).
 
 **Key Goals:**
-- Search for TV series/movies and retrieve metadata.
-- Select local files and map them to metadata entries.
+- Select local media files and derive the require movie/tv show from the directory name.
+- Search for TV series/movies and retrieve metadata based on the pulled title, show the results from the search on screen for the user to choose the correct one or to correct the results.
+- Once the correct movie/show has been selected, atomatically map the local files to the metadata entries.
 - Preview original vs. proposed filenames.
 - Confirm and execute renaming operations on the filesystem.
 
@@ -21,8 +22,8 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 ### 2.1. High-Level Components
 
 - **Frontend (React):**
-  - Search UI
-  - File picker and mapping interface
+  - File picker and mapping interface.
+  - Media discplay screen to choose the movie/series.
   - Rename preview modal
   - Confirmation & status feedback
 
@@ -30,9 +31,8 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
   - API endpoints: search, metadata fetch, preview rename, execute rename
   - Metadata service integration (TVmaze, TMDb, etc.)
   - File system operations
-  - Validation & 
+  - Validation
   - Error Handling: Show an eror message depending on the issue -> * API rate limits or unavailability. * No search results found. * Files are locked or in use during renaming. * Invalid file types selected. * Duplicate episode numbers in metadata or local files. * Network connectivity issues. *
-  - 
 
 
 ---
@@ -98,14 +98,14 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
   - File picker: HTML5 File System Access API
 
 - **Backend:**
-  - Python 3.10+
+  - Python 3.12
+  - uv for python environment and package management
   - FastAPI
   - HTTP client: httpx or requests
   - Caching: functools LRU or SQLite
 
 - **Metadata API Options (free tier):**
-  - TVmaze API (no API key required)
-  - TMDb (free API key)
+  - TMDb (free API key) for movies and tv shows. Setup,  can provide the API key.
 
 - **Development Tools:**
   - VSCode with Copilot
@@ -120,21 +120,29 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 
 ## 6. Component Design & Data Flow
 
-1. **Search Screen**  
-   - User enters query → React calls `GET /api/search?query=` → FastAPI fetches from metadata API → returns list of matching TV or Movie titles.
+1. **File Picker & Mapping Page**  
+   - User picks a directory → frontend reads filenames → displays list. 
+   - Screen displays the TV Series/Movie name from the directory which te user can edit if needed.
+   - Search button to execute the API search for the movie/tv show and load the next page. 
+   - React calls `GET /api/search?query=` → FastAPI fetches from metadata API → returns list of matching TV or Movie titles.
+   - Normalize/Validate filenames as soon as the directory is read (e.g. filter out non-media files).
+   - Expose quick “reset” in case the directory name → search term mapping isn’t accurate.
 
-2. **Metadata Browser**  
-   - On title select → `GET /api/series/{id}/episodes` → returns the Movie or TV seasons & episodes.
+2. **Metadata Browser/Display Screen**  
+   - Displays all possible series/movies from the search and suer can select the correct one to go to the next screen.
+   - On series select → `GET /api/series/{id}/episodes` → TV seasons & episodes.
+   - or title select `GET /api/movie/{id}` → Movie.
+   - Paginate search results or show “load more” if the API returns a lot of matches.
+   - On a TV series selection, preload the next-level call (/shows/{id}/episodes) to hide any spinner.
 
-3. **File Picker & Mapping**  
-   - User picks a directory → frontend reads filenames → displays list.  
-   - Auto-map by parsing existing names or manual drag-and-drop.
+3. **Preview Rename**  
+   - Frontend builds rename map → displays “Current Name” vs. “Proposed Name” for movie or tv series.
+   - Group errors (e.g. duplicate episode numbers) inline in the preview table so users can fix mapping before confirming.
 
-4. **Preview Rename**  
-   - Frontend builds rename map → displays “Current Name” vs. “Proposed Name”.
-
-5. **Execute Rename**  
+4. **Execute Rename**  
    - User confirms → POST `/api/rename` with map → backend performs atomic `os.rename` operations → returns success/errors.
+   - Wrap the batch of os.rename calls in a transaction-like rollback on partial failure (or at least surface which files failed and which succeeded).
+   - Return a detailed report object (e.g. { success: [], failed: [{ name, reason }] }) so the UI can show per-file status.
 
 ---
 
@@ -145,20 +153,27 @@ Tech-savvy users with downloaded media libraries who want consistent file naming
 - **File Mapping Screen:** Two-column layout: “Files” and “Episodes”; drag-and-drop or auto-match.  
 - **Preview Modal:** Table of old vs. new filenames; Confirm/Cancel buttons.  
 - **Status Notifications:** Toasts for success/failure messages.
-- **All Pages:* *Should contain a return to main/home button and a back button
+- **All Pages:** Should contain a return to main/home button and a back button
 
 ---
 
 ## 8. API Integration
 
-- **TVmaze Search:**  
-  `GET https://api.tvmaze.com/search/shows?q={query}`
+- **Search Movies:**  
+  `GET https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}&page={page}`
 
-- **Episodes List:**  
-  `GET https://api.tvmaze.com/shows/{id}/episodes`
+- **Search TV Shows:**  
+  `GET https://api.themoviedb.org/3/search/tv?api_key={API_KEY}&query={query}&page={page}`
 
-> **Normalize Response Fields:**  
-> `season`, `number`, `name`, `airdate`
+- **Movie Details:**  
+  `GET https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}`
+
+- **Season Details (Episodes):**  
+  `GET https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}?api_key={API_KEY}`
+
+- **Normalize Response Fields:**  
+  **TV Shows:** `season`, `episode_number`, `name`, `air_date`  
+  **Movies:** `title`, `release_date` (year), `id`, `overview`, `poster_path`  
 
 ---
 
