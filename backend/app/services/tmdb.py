@@ -29,6 +29,7 @@ class TMDBService:
                     "year": int(item.get("release_date", "")[:4])
                     if item.get("release_date")
                     else None,
+                    "poster_path": item.get("poster_path"),
                 }
                 if not result["year"] and item.get("first_air_date"):
                     result["year"] = int(item["first_air_date"][:4])

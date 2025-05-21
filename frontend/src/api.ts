@@ -7,6 +7,7 @@ export interface SearchResult {
   media_type: 'movie' | 'tv';
   title: string;
   year: number;
+  poster_path?: string;
 }
 
 export interface MovieDetails {

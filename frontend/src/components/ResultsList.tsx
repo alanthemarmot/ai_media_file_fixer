@@ -15,7 +15,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 max-w-3xl mx-auto">
       <h2 className="text-xl font-semibold mb-4">Search Results</h2>
       <div className="divide-y divide-gray-200">
         {results.map((result) => (
@@ -24,9 +24,16 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
             onClick={() => onSelect(result)}
             className="w-full text-left px-4 py-3 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">{result.title}</h3>
+            <div className="flex items-center gap-4">
+              {result.poster_path && (
+                <img
+                  src={`https://image.tmdb.org/t/p/w92${result.poster_path}`}
+                  alt={result.title}
+                  className="w-16 h-24 object-cover rounded shadow"
+                />
+              )}
+              <div className="flex-1">
+                <h3 className="font-medium text-lg">{result.title}</h3>
                 <p className="text-sm text-gray-500">
                   {result.year} • {result.media_type === 'tv' ? 'TV Show' : 'Movie'}
                 </p>
