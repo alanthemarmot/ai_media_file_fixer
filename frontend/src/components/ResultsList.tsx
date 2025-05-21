@@ -14,46 +14,59 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
     );
   }
 
+  const tvShows = results.filter(r => r.media_type === 'tv');
+  const movies = results.filter(r => r.media_type === 'movie');
+
   return (
-    <div className="space-y-2 max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Search Results</h2>
-      <div className="divide-y divide-gray-200">
-        {results.map((result) => (
-          <button
-            key={`${result.media_type}-${result.id}`}
-            onClick={() => onSelect(result)}
-            className="w-full text-left px-4 py-3 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
-          >
-            <div className="flex items-center gap-4">
-              {result.poster_path && (
-                <img
-                  src={`https://image.tmdb.org/t/p/w92${result.poster_path}`}
-                  alt={result.title}
-                  className="w-16 h-24 object-cover rounded shadow"
-                />
-              )}
-              <div className="flex-1">
-                <h3 className="font-medium text-lg">{result.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {result.year} • {result.media_type === 'tv' ? 'TV Show' : 'Movie'}
-                </p>
-              </div>
-              <svg
-                className="h-5 w-5 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+    <div className="space-y-8 max-w-4xl mx-auto">
+      {tvShows.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">TV Shows</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {tvShows.map((result) => (
+              <button
+                key={`tv-${result.id}`}
+                onClick={() => onSelect(result)}
+                className="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-          </button>
-        ))}
-      </div>
+                {result.poster_path && (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w185${result.poster_path}`}
+                    alt={result.title}
+                    className="w-32 h-48 object-cover rounded mb-2"
+                  />
+                )}
+                <span className="font-medium text-center text-lg">{result.title}</span>
+                <span className="text-sm text-gray-500">{result.year}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {movies.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Movies</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {movies.map((result) => (
+              <button
+                key={`movie-${result.id}`}
+                onClick={() => onSelect(result)}
+                className="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {result.poster_path && (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w185${result.poster_path}`}
+                    alt={result.title}
+                    className="w-32 h-48 object-cover rounded mb-2"
+                  />
+                )}
+                <span className="font-medium text-center text-lg">{result.title}</span>
+                <span className="text-sm text-gray-500">{result.year}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
