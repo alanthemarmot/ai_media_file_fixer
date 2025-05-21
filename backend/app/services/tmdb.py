@@ -37,6 +37,29 @@ class TMDBService:
 
             return results
 
+    async def get_tv_seasons(self, tv_id: int) -> List[Dict[str, Any]]:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/tv/{tv_id}", params={"api_key": self.api_key}
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            seasons = []
+            for season in data.get("seasons", []):
+                # Skip season 0 which is usually specials
+                if season["season_number"] > 0:
+                    seasons.append(
+                        {
+                            "season_number": season["season_number"],
+                            "name": season["name"],
+                            "poster_path": season["poster_path"],
+                            "episode_count": season["episode_count"],
+                        }
+                    )
+
+            return seasons
+
     async def get_details(self, id: int, media_type: str) -> Dict[str, Any]:
         async with httpx.AsyncClient() as client:
             if media_type == "movie":

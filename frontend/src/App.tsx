@@ -5,6 +5,7 @@ import ResultsList from './components/ResultsList'
 import DisplayArea from './components/DisplayArea'
 import SeasonList from './components/SeasonList'
 import './App.css'
+import { getTVSeasons } from './api';
 
 function App() {
   const [searchResults, setSearchResults] = useState<any[]>([])
@@ -13,12 +14,6 @@ function App() {
   const [selectedSeason, setSelectedSeason] = useState<any | null>(null)
   const [view, setView] = useState<'results' | 'seasons' | 'details'>('results')
   const [loadingSeasons, setLoadingSeasons] = useState(false)
-
-  // Fetch seasons for a TV show
-  const getTVSeasons = async (id: number) => {
-    const res = await fetch(`/api/seasons?id=${id}`);
-    return await res.json();
-  }
 
   const handleSearch = (results: any[]) => {
     setSearchResults(results)
@@ -37,6 +32,8 @@ function App() {
       try {
         const s = await getTVSeasons(item.id);
         setSeasons(s);
+      } catch (error) {
+        console.error('Error fetching seasons:', error);
       } finally {
         setLoadingSeasons(false);
       }
@@ -73,33 +70,40 @@ function App() {
                   )}
                   {view === 'seasons' && selectedItem && selectedItem.media_type === 'tv' && (
                     <div className="flex flex-col min-h-[400px]">
+                      <div className="mb-4 flex items-center">
+                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline mr-4">
+                          <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
+                        </button>
+                        <h2 className="text-xl font-semibold">{selectedItem.title} - Seasons</h2>
+                      </div>
                       <div className="flex-1">
                         {loadingSeasons ? (
                           <div className="text-center text-gray-500 py-4">Loading seasons...</div>
-                        ) : (
+                        ) : seasons.length > 0 ? (
                           <SeasonList
                             seasons={seasons}
                             onSelect={handleSeasonSelect}
                             selectedSeason={selectedSeason?.season_number}
                           />
+                        ) : (
+                          <div className="text-center text-gray-500 py-4">No seasons found</div>
                         )}
-                      </div>
-                      <div className="mt-8 flex justify-center">
-                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline">
-                          <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
-                        </button>
                       </div>
                     </div>
                   )}
                   {view === 'details' && selectedItem && (
                     <div className="flex flex-col min-h-[400px]">
-                      <div className="flex-1">
-                        <DisplayArea selectedItem={selectedItem} />
-                      </div>
-                      <div className="mt-8 flex justify-center">
-                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline">
+                      <div className="mb-4 flex items-center">
+                        <button onClick={() => selectedItem.media_type === 'tv' ? setView('seasons') : handleBack()} className="flex items-center text-blue-600 hover:underline mr-4">
                           <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
                         </button>
+                        <h2 className="text-xl font-semibold">
+                          {selectedItem.title}
+                          {selectedSeason && ` - ${selectedSeason.name}`}
+                        </h2>
+                      </div>
+                      <div className="flex-1">
+                        <DisplayArea selectedItem={selectedItem} />
                       </div>
                     </div>
                   )}

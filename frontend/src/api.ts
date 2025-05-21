@@ -23,6 +23,13 @@ export interface TVShowDetails {
   episode_title: string;
 }
 
+export interface TVSeason {
+  season_number: number;
+  name: string;
+  poster_path?: string;
+  episode_count?: number;
+}
+
 export type MediaDetails = MovieDetails | TVShowDetails;
 
 export const searchMedia = async (query: string): Promise<SearchResult[]> => {
@@ -50,4 +57,24 @@ export const getMediaDetails = async (id: number, type: 'movie' | 'tv'): Promise
     params: { id, type }
   });
   return response.data;
+};
+
+export const getTVSeasons = async (id: number): Promise<TVSeason[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/seasons`, {
+      params: { id }
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.code === 'ECONNREFUSED') {
+        throw new Error('Unable to connect to the server. Is the backend running?');
+      }
+      if (error.response?.status === 404) {
+        throw new Error('Seasons endpoint not found. Please check the API URL.');
+      }
+      throw new Error(error.response?.data?.detail || 'An error occurred while fetching seasons.');
+    }
+    throw error;
+  }
 };

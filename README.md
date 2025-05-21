@@ -46,16 +46,26 @@ A lightweight local web app to help you search The Movie Database (TMDb), select
    ```
    TMDB_API_KEY=your_tmdb_api_key_here
    ```
-3. **Run the startup script:**
+3. **Make sure [uv](https://docs.astral.sh/uv/guides/) is installed**:
+   ```sh
+   # Install uv using pipx (recommended)
+   pipx install uv
+   
+   # Or with pip for user installation
+   pip install uv
+   ```
+
+4. **Run the startup script:**
    ```sh
    ./start.sh
    ```
    This will:
-   - Set up the Python environment and install dependencies
+   - Set up a Python virtual environment using uv
+   - Install dependencies with uv
    - Start the FastAPI backend (port 8000)
    - Install frontend dependencies and start the React dev server (port 5173)
 
-4. **Open the app**
+5. **Open the app**
    - Visit the local URL shown in your terminal (usually http://localhost:5173)
 
 ### Stopping the App
@@ -66,11 +76,12 @@ A lightweight local web app to help you search The Movie Database (TMDb), select
 ## Project Structure
 ```
 media_file_renamer/
-├── backend/         # FastAPI backend
-├── frontend/        # React frontend
-├── start.sh         # Startup script
-├── requirements.txt # Python dependencies
-├── README.md        # This file
+├── backend/           # FastAPI backend
+├── frontend/          # React frontend
+├── start.sh           # Startup script (uses uv for Python env)
+├── update_dependencies.sh  # Script to update Python dependencies
+├── requirements.txt   # Python dependencies
+├── README.md          # This file
 ```
 
 ---
@@ -78,6 +89,7 @@ media_file_renamer/
 ## Development
 - **Backend**: Edit code in `backend/app/`, run tests with `pytest backend/`
 - **Frontend**: Edit code in `frontend/src/`, run tests with your preferred React testing tools
+- **Dependencies**: Update Python dependencies with `./update_dependencies.sh`
 
 ---
 
