@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
 import type { TVEpisode } from '../api';
+import '../components/IconLink.css';
 
 const DEFAULT_QUALITY = '1080p';
 
@@ -74,10 +75,10 @@ export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quali
             </div>
             <button
               onClick={() => handleCopy(ep, idx)}
-              className="flex items-center text-blue-600 hover:underline text-xs self-end sm:self-auto sm:ml-auto"
+              className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-3 py-1 text-xs self-end sm:self-auto sm:ml-auto transition-colors"
               style={{ minWidth: '70px' }}
             >
-              {copiedIndex === idx ? <CheckIcon className="w-4 h-4 text-green-500 mr-1" /> : <ClipboardIcon className="w-4 h-4 mr-1" />}
+              {copiedIndex === idx ? <CheckIcon className="w-4 h-4 text-white mr-1" /> : <ClipboardIcon className="w-4 h-4 mr-1" />}
               {copiedIndex === idx ? 'Copied!' : 'Copy'}
             </button>
           </div>

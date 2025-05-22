@@ -100,13 +100,15 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
               className="w-24 h-36 object-cover rounded shadow"
             />
           )}
-          <h2 className="text-2xl font-bold text-center">
-            {details ? details.title : selectedItem.title} {!('episode_title' in details) && details.year ? `[${details.year}]` : ''}
-          </h2>
+          <div className="flex items-center">
+            <h2 className="text-2xl font-bold text-center">
+              {details ? details.title : selectedItem.title} {!('episode_title' in details) && details.year ? `[${details.year}]` : ''}
+            </h2>
+          </div>
         </div>
       </div>
       
-      <h2 className="text-xl font-semibold">Media Details</h2>
+      <h2 className="text-xl font-semibold mb-4">Media Details</h2>
       <div className="bg-gray-50 p-4 rounded-lg">
         {'episode_title' in details ? (
           // TV Show details
@@ -152,10 +154,10 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
         <h3 className="text-sm font-medium text-gray-700">Generated filename:</h3>
         <button
           onClick={copyToClipboard}
-          className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900"
+          className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
         >
           {copied ? (
-            <CheckIcon className="w-5 h-5 text-green-500" />
+            <CheckIcon className="w-5 h-5 text-white" />
           ) : (
             <ClipboardIcon className="w-5 h-5" />
           )}

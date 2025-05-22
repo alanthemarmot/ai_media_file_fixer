@@ -1,3 +1,5 @@
+import '../components/IconLink.css';
+
 interface TVSeason {
   season_number: number;
   name: string;

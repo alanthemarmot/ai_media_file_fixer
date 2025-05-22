@@ -1,4 +1,5 @@
 import type { SearchResult } from '../api';
+import '../components/IconLink.css';
 
 interface ResultsListProps {
   results: SearchResult[];
