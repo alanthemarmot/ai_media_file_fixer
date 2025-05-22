@@ -12,6 +12,8 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  // Add local quality state for movies
+  const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality as any || '1080p');
 
   useEffect(() => {
     if (!selectedItem) {
@@ -37,14 +39,22 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
     fetchDetails();
   }, [selectedItem]);
 
+  useEffect(() => {
+    setSelectedQuality(quality as any);
+  }, [quality]);
+
+  const handleQualityChange = (q: '720p' | '1080p' | '2160p') => {
+    setSelectedQuality(q);
+  };
+
   const getFileName = () => {
     if (!details) return '';
     if ('episode' in details) {
       // TV Show
-      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${details.episode_title} (${quality})`;
+      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${details.episode_title} (${selectedQuality})`;
     } else {
       // Movie
-      return `${details.title} [${details.year}] (${quality})`;
+      return `${details.title} [${details.year}](${selectedQuality})`;
     }
   };
 
@@ -107,7 +117,6 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
           </div>
         </div>
       </div>
-      
       <h2 className="text-xl font-semibold mb-4">Media Details</h2>
       <div className="bg-gray-50 p-4 rounded-lg">
         {'episode_title' in details ? (
@@ -128,7 +137,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
               <code className="block bg-gray-100 p-2 rounded mt-1">
                 {`${details.title} - S${details.season.toString().padStart(2, '0')}E${details.episode
                   .toString()
-                  .padStart(2, '0')} - ${details.episode_title} (${quality})`}
+                  .padStart(2, '0')} - ${details.episode_title} (${selectedQuality})`}
               </code>
             </div>
           </div>
@@ -141,10 +150,46 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
             <p>
               <span className="font-medium">Year:</span> {details.year}
             </p>
+            {/* Quality selector for movies */}
+            <div className="mb-3">
+              <label className="text-sm font-medium text-gray-700 block mb-2">Select quality format:</label>
+              <div className="flex justify-center space-x-4">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="movie-quality"
+                    checked={selectedQuality === '720p'}
+                    onChange={() => handleQualityChange('720p')}
+                  />
+                  <span className="ml-2">720p</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="movie-quality"
+                    checked={selectedQuality === '1080p'}
+                    onChange={() => handleQualityChange('1080p')}
+                  />
+                  <span className="ml-2">1080p</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="movie-quality"
+                    checked={selectedQuality === '2160p'}
+                    onChange={() => handleQualityChange('2160p')}
+                  />
+                  <span className="ml-2">2160p</span>
+                </label>
+              </div>
+            </div>
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
               <code className="block bg-gray-100 p-2 rounded mt-1">
-                {`${details.title} (${details.year})`}
+                {`${details.title} [${details.year}](${selectedQuality})`}
               </code>
             </div>
           </div>

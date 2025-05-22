@@ -1,14 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { searchMedia, type SearchResult } from '../api';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface SearchBarProps {
   onSearch: (results: SearchResult[]) => void;
+  resetTrigger?: number;
+  onReset?: () => void;
+  hasResults?: boolean;
 }
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
+export default function SearchBar({ onSearch, resetTrigger = 0, onReset, hasResults = false }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      setQuery('');
+    }
+  }, [resetTrigger]);
+  
+  const handleReset = () => {
+    setQuery('');
+    if (onReset) {
+      onReset();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,26 +46,39 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a movie or TV show..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-        >
-          {isLoading ? 'Searching...' : 'Search'}
-        </button>
-      </div>
-      {error && (
-        <div className="text-red-500 text-sm mt-2">{error}</div>
+    <div>
+      {hasResults && (
+        <div className="flex justify-end mb-2">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="flex items-center text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition-colors"
+          >
+            <XMarkIcon className="w-4 h-4 mr-1" /> Clear search
+          </button>
+        </div>
       )}
-    </form>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search for a movie or TV show..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {isLoading ? 'Searching...' : 'Search'}
+          </button>
+        </div>
+        {error && (
+          <div className="text-red-500 text-sm mt-2">{error}</div>
+        )}
+      </form>
+    </div>
   );
 }

@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
-import type { TVEpisode } from '../api';
+import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outlin              <input 
+                type="radio" 
+                className="form-radio text-blue-600" 
+                name="quality" 
+                checked={selectedQuality === '2160p'} 
+                onChange={() => handleQualityChange('2160p')}
+              />port type { TVEpisode } from '../api';
 import '../components/IconLink.css';
 
 const DEFAULT_QUALITY = '1080p';
@@ -9,7 +14,7 @@ interface EpisodeListProps {
   episodes: TVEpisode[];
   seriesTitle: string;
   seasonNumber: number;
-  quality?: '720p' | '1080p' | '2160p';
+  quality?: string;
   selectedSeason?: {
     poster_path?: string;
   };
@@ -22,17 +27,17 @@ export default function EpisodeList({
   episodes, 
   seriesTitle, 
   seasonNumber, 
-  quality = DEFAULT_QUALITY as '1080p',
+  quality = DEFAULT_QUALITY, 
   selectedSeason, 
   moviePosterPath, 
   network,
   onQualityChange
 }: EpisodeListProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality);
+  const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality as '1080p');
 
   useEffect(() => {
-    setSelectedQuality(quality);
+    setSelectedQuality(quality as '1080p');
   }, [quality]);
 
   const handleQualityChange = (newQuality: '720p' | '1080p' | '2160p') => {
@@ -65,14 +70,14 @@ export default function EpisodeList({
             <img
               src={`https://image.tmdb.org/t/p/w154${moviePosterPath}`}
               alt={`${seriesTitle}${seasonNumber ? ` - Season ${seasonNumber}` : ''}`}
-              className="w-20 h-28 object-cover rounded shadow bg-white"
+              className="w-20 h-28 object-cover rounded shadow"
             />
           )}
           {!moviePosterPath && selectedSeason?.poster_path && (
             <img
               src={`https://image.tmdb.org/t/p/w154${selectedSeason.poster_path}`}
               alt={`${seriesTitle} - Season ${seasonNumber}`}
-              className="w-20 h-28 object-cover rounded shadow bg-white"
+              className="w-20 h-28 object-cover rounded shadow"
             />
           )}
           <div className="flex flex-col items-center">
@@ -89,7 +94,7 @@ export default function EpisodeList({
       <div className="mb-6 bg-gray-50 p-4 rounded-lg">
         <div className="mb-3">
           <label className="text-sm font-medium text-gray-700 block mb-2">Select quality format:</label>
-          <div className="flex justify-center space-x-4">
+          <div className="flex space-x-4">
             <label className="inline-flex items-center">
               <input 
                 type="radio" 
