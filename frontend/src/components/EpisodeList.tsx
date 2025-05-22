@@ -13,9 +13,10 @@ interface EpisodeListProps {
     poster_path?: string;
   };
   moviePosterPath?: string;
+  network?: string;
 }
 
-export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quality = DEFAULT_QUALITY, selectedSeason, moviePosterPath }: EpisodeListProps) {
+export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quality = DEFAULT_QUALITY, selectedSeason, moviePosterPath, network }: EpisodeListProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const getFilename = (ep: TVEpisode) => {
@@ -51,9 +52,14 @@ export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quali
               className="w-20 h-28 object-cover rounded shadow"
             />
           )}
-          <h3 className="text-2xl font-bold text-center">
-            {seriesTitle} {seasonNumber ? `- Season ${seasonNumber}` : ''}
-          </h3>
+          <div className="flex flex-col items-center">
+            <h3 className="text-2xl font-bold text-center">
+              {seriesTitle} {seasonNumber ? `- Season ${seasonNumber}` : ''}
+            </h3>
+            {network && (
+              <span className="text-sm text-gray-500 font-medium mt-1">{network}</span>
+            )}
+          </div>
         </div>
       </div>
       <h3 className="text-lg font-semibold mb-2">Episodes</h3>
