@@ -105,6 +105,8 @@ function App() {
                             seriesTitle={selectedItem.title}
                             seasonNumber={selectedSeason.season_number}
                             quality={quality}
+                            selectedSeason={selectedSeason}
+                            moviePosterPath={selectedItem.poster_path}
                           />
                         ) : (
                           <div className="text-center text-gray-500 py-4">No episodes found</div>

@@ -9,9 +9,13 @@ interface EpisodeListProps {
   seriesTitle: string;
   seasonNumber: number;
   quality?: string;
+  selectedSeason?: {
+    poster_path?: string;
+  };
+  moviePosterPath?: string;
 }
 
-export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quality = DEFAULT_QUALITY }: EpisodeListProps) {
+export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quality = DEFAULT_QUALITY, selectedSeason, moviePosterPath }: EpisodeListProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const getFilename = (ep: TVEpisode) => {
@@ -31,17 +35,41 @@ export default function EpisodeList({ episodes, seriesTitle, seasonNumber, quali
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-col items-center mb-6">
+        <div className="flex items-center gap-4">
+          {moviePosterPath && (
+            <img
+              src={`https://image.tmdb.org/t/p/w154${moviePosterPath}`}
+              alt={`${seriesTitle}${seasonNumber ? ` - Season ${seasonNumber}` : ''}`}
+              className="w-20 h-28 object-cover rounded shadow"
+            />
+          )}
+          {!moviePosterPath && selectedSeason?.poster_path && (
+            <img
+              src={`https://image.tmdb.org/t/p/w154${selectedSeason.poster_path}`}
+              alt={`${seriesTitle} - Season ${seasonNumber}`}
+              className="w-20 h-28 object-cover rounded shadow"
+            />
+          )}
+          <h3 className="text-2xl font-bold text-center">
+            {seriesTitle} {seasonNumber ? `- Season ${seasonNumber}` : ''}
+          </h3>
+        </div>
+      </div>
       <h3 className="text-lg font-semibold mb-2">Episodes</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="flex flex-col gap-4">
         {episodes.map((ep, idx) => (
-          <div key={ep.episode_number} className="bg-gray-50 p-3 rounded border flex flex-col">
-            <span className="font-medium mb-1">Ep {ep.episode_number}: {ep.name}</span>
-            <code className="block bg-white p-2 rounded text-xs mb-2 select-all">
-              {getFilename(ep)}
-            </code>
+          <div key={ep.episode_number} className="bg-gray-50 p-3 rounded border flex flex-col sm:flex-row sm:items-center">
+            <div className="flex-1 flex flex-col sm:flex-row sm:items-center">
+              <span className="font-medium mb-1 sm:mb-0 sm:mr-4">Ep {ep.episode_number}: {ep.name}</span>
+              <code className="block bg-white p-2 rounded text-xs mb-2 sm:mb-0 sm:mr-4 select-all">
+                {getFilename(ep)}
+              </code>
+            </div>
             <button
               onClick={() => handleCopy(ep, idx)}
-              className="flex items-center text-blue-600 hover:underline text-xs self-end"
+              className="flex items-center text-blue-600 hover:underline text-xs self-end sm:self-auto sm:ml-auto"
+              style={{ minWidth: '70px' }}
             >
               {copiedIndex === idx ? <CheckIcon className="w-4 h-4 text-green-500 mr-1" /> : <ClipboardIcon className="w-4 h-4 mr-1" />}
               {copiedIndex === idx ? 'Copied!' : 'Copy'}

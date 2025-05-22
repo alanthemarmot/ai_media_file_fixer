@@ -90,6 +90,22 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
 
   return (
     <div className="space-y-4">
+      {/* Display poster and title at the top */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="flex items-center gap-4">
+          {selectedItem.poster_path && (
+            <img
+              src={`https://image.tmdb.org/t/p/w154${selectedItem.poster_path}`}
+              alt={details ? details.title : selectedItem.title}
+              className="w-24 h-36 object-cover rounded shadow"
+            />
+          )}
+          <h2 className="text-2xl font-bold text-center">
+            {details ? details.title : selectedItem.title} {!('episode_title' in details) && details.year ? `[${details.year}]` : ''}
+          </h2>
+        </div>
+      </div>
+      
       <h2 className="text-xl font-semibold">Media Details</h2>
       <div className="bg-gray-50 p-4 rounded-lg">
         {'episode_title' in details ? (
