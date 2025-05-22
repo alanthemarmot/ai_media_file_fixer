@@ -4,16 +4,19 @@ import SearchBar from './components/SearchBar'
 import ResultsList from './components/ResultsList'
 import DisplayArea from './components/DisplayArea'
 import SeasonList from './components/SeasonList'
+import EpisodeList from './components/EpisodeList';
 import './App.css'
-import { getTVSeasons } from './api';
+import { getTVSeasons, getTVEpisodes } from './api';
 
 function App() {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [selectedItem, setSelectedItem] = useState<any | null>(null)
   const [seasons, setSeasons] = useState<any[]>([])
   const [selectedSeason, setSelectedSeason] = useState<any | null>(null)
-  const [view, setView] = useState<'results' | 'seasons' | 'details'>('results')
-  const [loadingSeasons, setLoadingSeasons] = useState(false)
+  const [view, setView] = useState<'results' | 'seasons' | 'details' | 'episodes'>('results')
+  const [episodes, setEpisodes] = useState<any[]>([]);
+  const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+  const [quality] = useState('1080p');
 
   const handleSearch = (results: any[]) => {
     setSearchResults(results)
@@ -27,15 +30,12 @@ function App() {
     setSelectedItem(item);
     setSelectedSeason(null);
     if (item.media_type === 'tv') {
-      setLoadingSeasons(true);
       setView('seasons');
       try {
         const s = await getTVSeasons(item.id);
         setSeasons(s);
       } catch (error) {
         console.error('Error fetching seasons:', error);
-      } finally {
-        setLoadingSeasons(false);
       }
     } else {
       setSeasons([]);
@@ -50,10 +50,20 @@ function App() {
     setView('results')
   }
 
-  const handleSeasonSelect = (season: any) => {
-    setSelectedSeason(season)
-    setView('details')
-  }
+  const handleSeasonSelect = async (season: any) => {
+    setSelectedSeason(season);
+    setView('episodes');
+    setEpisodes([]);
+    setLoadingEpisodes(true);
+    try {
+      const eps = await getTVEpisodes(selectedItem.id, season.season_number);
+      setEpisodes(eps);
+    } catch (e) {
+      setEpisodes([]);
+    } finally {
+      setLoadingEpisodes(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center">
@@ -69,41 +79,53 @@ function App() {
                     <ResultsList results={searchResults} onSelect={handleSelect} />
                   )}
                   {view === 'seasons' && selectedItem && selectedItem.media_type === 'tv' && (
-                    <div className="flex flex-col min-h-[400px]">
-                      <div className="mb-4 flex items-center">
-                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline mr-4">
+                    <div className="flex flex-col min-h-[400px] h-full">
+                      <div className="flex-1">
+                        <SeasonList
+                          seasons={seasons}
+                          onSelect={handleSeasonSelect}
+                          selectedSeason={selectedSeason?.season_number}
+                        />
+                      </div>
+                      <div className="mt-8 flex justify-center">
+                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline">
                           <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
                         </button>
-                        <h2 className="text-xl font-semibold">{selectedItem.title} - Seasons</h2>
                       </div>
+                    </div>
+                  )}
+                  {view === 'episodes' && selectedItem && selectedSeason && (
+                    <div className="flex flex-col min-h-[400px] h-full">
                       <div className="flex-1">
-                        {loadingSeasons ? (
-                          <div className="text-center text-gray-500 py-4">Loading seasons...</div>
-                        ) : seasons.length > 0 ? (
-                          <SeasonList
-                            seasons={seasons}
-                            onSelect={handleSeasonSelect}
-                            selectedSeason={selectedSeason?.season_number}
+                        {loadingEpisodes ? (
+                          <div className="text-center text-gray-500 py-4">Loading episodes...</div>
+                        ) : episodes.length > 0 ? (
+                          <EpisodeList
+                            episodes={episodes}
+                            seriesTitle={selectedItem.title}
+                            seasonNumber={selectedSeason.season_number}
+                            quality={quality}
                           />
                         ) : (
-                          <div className="text-center text-gray-500 py-4">No seasons found</div>
+                          <div className="text-center text-gray-500 py-4">No episodes found</div>
                         )}
+                      </div>
+                      <div className="mt-8 flex justify-center">
+                        <button onClick={() => setView('seasons')} className="flex items-center text-blue-600 hover:underline">
+                          <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
+                        </button>
                       </div>
                     </div>
                   )}
                   {view === 'details' && selectedItem && (
-                    <div className="flex flex-col min-h-[400px]">
-                      <div className="mb-4 flex items-center">
-                        <button onClick={() => selectedItem.media_type === 'tv' ? setView('seasons') : handleBack()} className="flex items-center text-blue-600 hover:underline mr-4">
+                    <div className="flex flex-col min-h-[400px] h-full">
+                      <div className="flex-1">
+                        <DisplayArea selectedItem={selectedItem} quality={quality} />
+                      </div>
+                      <div className="mt-8 flex justify-center">
+                        <button onClick={handleBack} className="flex items-center text-blue-600 hover:underline">
                           <ArrowLeftIcon className="w-5 h-5 mr-1" /> Back
                         </button>
-                        <h2 className="text-xl font-semibold">
-                          {selectedItem.title}
-                          {selectedSeason && ` - ${selectedSeason.name}`}
-                        </h2>
-                      </div>
-                      <div className="flex-1">
-                        <DisplayArea selectedItem={selectedItem} />
                       </div>
                     </div>
                   )}

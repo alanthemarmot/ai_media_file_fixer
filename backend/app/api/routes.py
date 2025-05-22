@@ -40,3 +40,12 @@ async def get_tv_seasons(id: int):
         return seasons
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/episodes")
+async def get_tv_episodes(id: int, season_number: int):
+    try:
+        episodes = await tmdb_service.get_tv_episodes(id, season_number)
+        return episodes
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

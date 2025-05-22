@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { type SearchResult, type MediaDetails, getMediaDetails } from '../api';
 
-const DEFAULT_QUALITY = '1080p';
-
 interface DisplayAreaProps {
   selectedItem: SearchResult | null;
+  quality?: string;
 }
 
-export default function DisplayArea({ selectedItem }: DisplayAreaProps) {
+export default function DisplayArea({ selectedItem, quality = '1080p' }: DisplayAreaProps) {
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +41,10 @@ export default function DisplayArea({ selectedItem }: DisplayAreaProps) {
     if (!details) return '';
     if ('episode' in details) {
       // TV Show
-      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${details.episode_title}.mkv`;
+      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${details.episode_title} (${quality})`;
     } else {
       // Movie
-      return `${details.title} [${details.year}] (${DEFAULT_QUALITY}).mkv`;
+      return `${details.title} [${details.year}] (${quality})`;
     }
   };
 
@@ -111,7 +110,7 @@ export default function DisplayArea({ selectedItem }: DisplayAreaProps) {
               <code className="block bg-gray-100 p-2 rounded mt-1">
                 {`${details.title} - S${details.season.toString().padStart(2, '0')}E${details.episode
                   .toString()
-                  .padStart(2, '0')} - ${details.episode_title}`}
+                  .padStart(2, '0')} - ${details.episode_title} (${quality})`}
               </code>
             </div>
           </div>

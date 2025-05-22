@@ -108,3 +108,25 @@ class TMDBService:
                     else None,
                     "episode_title": latest_episode["name"] if latest_episode else None,
                 }
+
+    async def get_tv_episodes(
+        self, tv_id: int, season_number: int
+    ) -> List[Dict[str, Any]]:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/tv/{tv_id}/season/{season_number}",
+                params={"api_key": self.api_key},
+            )
+            response.raise_for_status()
+            data = response.json()
+            episodes = []
+            for ep in data.get("episodes", []):
+                episodes.append(
+                    {
+                        "episode_number": ep["episode_number"],
+                        "season_number": ep["season_number"],
+                        "name": ep["name"],
+                        "air_date": ep.get("air_date"),
+                    }
+                )
+            return episodes
