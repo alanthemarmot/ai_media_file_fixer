@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { useState, useRef } from 'react'
 import SearchBar from './components/SearchBar'
 import ResultsList from './components/ResultsList'
 import DisplayArea from './components/DisplayArea'
 import SeasonList from './components/SeasonList'
 import EpisodeList from './components/EpisodeList';
+import Breadcrumb from './components/Breadcrumb';
+import type { BreadcrumbItem } from './components/Breadcrumb';
 import './App.css'
 import './components/IconLink.css'
 import { getTVSeasons, getTVEpisodes, getMediaDetails } from './api';
@@ -19,7 +20,6 @@ function App() {
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const [quality, setQuality] = useState<'720p' | '1080p' | '2160p'>('1080p');
   const [resetSearchCounter, setResetSearchCounter] = useState(0);
-  const [contentRequiresScroll, setContentRequiresScroll] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
 
   const handleQualityChange = (newQuality: '720p' | '1080p' | '2160p') => {
@@ -74,12 +74,13 @@ function App() {
     }
   }
 
-  const handleBack = () => {
-    setSelectedItem(null)
-    setSelectedSeason(null)
-    setSeasons([])
-    setView('results')
-  }
+  // Add a function to go back to seasons view
+  const goToSeasons = () => {
+    if (selectedItem?.media_type === 'tv') {
+      setSelectedSeason(null);
+      setView('seasons');
+    }
+  };
 
   const handleSeasonSelect = async (season: any) => {
     setSelectedSeason(season);
@@ -96,40 +97,47 @@ function App() {
     }
   };
 
-  // Check if content requires scroll
-  useEffect(() => {
-    const checkScroll = () => {
-      const el = mainContentRef.current;
-      if (!el) return;
-      const viewportHeight = window.innerHeight;
-      const contentHeight = el.scrollHeight;
-      setContentRequiresScroll(contentHeight > viewportHeight * 0.9);
-    };
+  // Function to generate breadcrumb items based on the current view
+  const getBreadcrumbItems = (): BreadcrumbItem[] => {
+    const items: BreadcrumbItem[] = [
+      { 
+        label: 'Home',
+        onClick: resetSearch 
+      }
+    ];
     
-    // Run check after a short delay to ensure content is rendered
-    const timer = setTimeout(checkScroll, 100);
+    // Add "Search Results" for results page and all subsequent pages
+    if ((searchResults.length > 0) && (view === 'results' || selectedItem)) {
+      items.push({
+        label: 'Search Results',
+        onClick: view !== 'results' ? () => {
+          setSelectedItem(null);
+          setSelectedSeason(null);
+          setView('results');
+        } : undefined
+      });
+    }
     
-    window.addEventListener('resize', checkScroll);
-    return () => {
-      window.removeEventListener('resize', checkScroll);
-      clearTimeout(timer);
-    };
-  }, [view, searchResults, selectedItem, selectedSeason, episodes, loadingEpisodes]);
+    // For pages with a selected item
+    if (selectedItem) {
+      items.push({
+        label: selectedItem.title,
+        onClick: selectedItem.media_type === 'tv' && view === 'episodes' ? goToSeasons : undefined
+      });
+      
+      if (view === 'episodes' && selectedSeason) {
+        items.push({
+          label: `Season ${selectedSeason.season_number}`,
+        });
+      }
+    }
+    
+    return items;
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center">
       <div className="relative py-3 max-w-7xl mx-auto w-full">
-        {/* Top-left back button, not flush to edge */}
-        {view !== 'results' && contentRequiresScroll && (
-          <button
-            onClick={handleBack}
-            className="absolute top-4 left-4 flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-3 py-1 text-xs shadow transition-colors z-20"
-            style={{ marginLeft: '0.5rem', marginTop: '0.5rem' }}
-            aria-label="Back"
-          >
-            <ArrowLeftIcon className="w-4 h-4 mr-1 text-white" /> Back
-          </button>
-        )}
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 overflow-x-hidden" ref={mainContentRef}>
           <div className="max-w-6xl mx-auto">
             <div className="divide-y divide-gray-200">
@@ -143,12 +151,20 @@ function App() {
                   />
                   <h1 className="text-3xl font-bold text-center">Media File Renamer</h1>
                 </div>
-                <SearchBar 
-                  onSearch={handleSearch} 
-                  resetTrigger={resetSearchCounter} 
-                  onReset={resetSearch} 
-                  hasResults={searchResults.length > 0} 
-                />
+                
+                {/* Breadcrumb navigation - now shown on all pages */}
+                <Breadcrumb items={getBreadcrumbItems()} />
+                
+                {/* Show SearchBar only on home/results page */}
+                {view === 'results' && (
+                  <SearchBar 
+                    onSearch={handleSearch} 
+                    resetTrigger={resetSearchCounter} 
+                    onReset={resetSearch} 
+                    hasResults={searchResults.length > 0} 
+                  />
+                )}
+                
                 <div className="mt-8 min-h-[400px]">
                   {view === 'results' && (
                     <ResultsList results={searchResults} onSelect={handleSelect} />
@@ -165,11 +181,6 @@ function App() {
                           quality={quality}
                           onQualityChange={handleQualityChange}
                         />
-                      </div>
-                      <div className="mt-8 flex justify-center">
-                        <button onClick={handleBack} className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 transition-colors">
-                          <ArrowLeftIcon className="w-5 h-5 mr-1 text-white" /> Back
-                        </button>
                       </div>
                     </div>
                   )}
@@ -193,11 +204,6 @@ function App() {
                           <div className="text-center text-gray-500 py-4">No episodes found</div>
                         )}
                       </div>
-                      <div className="mt-8 flex justify-center">
-                        <button onClick={() => setView('seasons')} className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 transition-colors">
-                          <ArrowLeftIcon className="w-5 h-5 mr-1 text-white" /> Back
-                        </button>
-                      </div>
                     </div>
                   )}
                   {view === 'details' && selectedItem && (
@@ -205,13 +211,10 @@ function App() {
                       <div className="flex-1">
                         <DisplayArea selectedItem={selectedItem} quality={quality} />
                       </div>
-                      <div className="mt-8 flex justify-center">
-                        <button onClick={handleBack} className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2 transition-colors">
-                          <ArrowLeftIcon className="w-5 h-5 mr-1 text-white" /> Back
-                        </button>
-                      </div>
                     </div>
                   )}
+                </div>
+                <div className="mt-4">
                 </div>
               </div>
             </div>
