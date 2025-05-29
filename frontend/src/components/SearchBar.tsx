@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { searchMedia, type SearchResult } from '../api';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { hasApiKey } from '../services/apiKeyService';
 
 interface SearchBarProps {
   onSearch: (results: SearchResult[]) => void;
@@ -13,12 +14,18 @@ export default function SearchBar({ onSearch, resetTrigger = 0, onReset, hasResu
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showApiKeyWarning, setShowApiKeyWarning] = useState(false);
 
   useEffect(() => {
     if (resetTrigger > 0) {
       setQuery('');
     }
   }, [resetTrigger]);
+  
+  useEffect(() => {
+    // Check if API key is missing and show warning
+    setShowApiKeyWarning(!hasApiKey());
+  }, []);
   
   const handleReset = () => {
     setQuery('');
@@ -38,7 +45,17 @@ export default function SearchBar({ onSearch, resetTrigger = 0, onReset, hasResu
       onSearch(results);
     } catch (error) {
       console.error('Search failed:', error);
-      setError('Search failed. Please try again.');
+      let errorMessage = 'Search failed. Please try again.';
+      
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes('Invalid API key') || 
+            error.message.includes('API key not found')) {
+          errorMessage = 'Invalid or missing API key. Please provide a valid TMDB API key.';
+        }
+      }
+      
+      setError(errorMessage);
       onSearch([]); // Clear any previous results
     } finally {
       setIsLoading(false);
@@ -58,6 +75,20 @@ export default function SearchBar({ onSearch, resetTrigger = 0, onReset, hasResu
           </button>
         </div>
       )}
+      
+      {showApiKeyWarning && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Warning:</strong> No API key detected. Your searches may not work.
+                You can set your API key in the setup screen.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex gap-2">
           <input

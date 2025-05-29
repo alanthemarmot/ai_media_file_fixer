@@ -1,6 +1,21 @@
 import axios from 'axios';
+import { getApiKey } from './services/apiKeyService';
 
 const API_BASE_URL = 'http://localhost:8000/api';
+
+// Create axios instance with default headers
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Add request interceptor to add API key header if available
+api.interceptors.request.use((config) => {
+  const apiKey = getApiKey();
+  if (apiKey) {
+    config.headers['x-api-key'] = apiKey;
+  }
+  return config;
+});
 
 export interface SearchResult {
   id: number;
@@ -39,9 +54,26 @@ export interface TVEpisode {
 
 export type MediaDetails = MovieDetails | TVShowDetails;
 
+/**
+ * Validates if an API key is valid
+ * @param apiKey - The API key to validate
+ * @returns A promise that resolves to true if valid, false otherwise
+ */
+export const validateApiKey = async (apiKey: string): Promise<boolean> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/validate-key`, {
+      params: { api_key: apiKey }
+    });
+    return response.data.valid === true;
+  } catch (error) {
+    console.error('Error validating API key:', error);
+    return false;
+  }
+};
+
 export const searchMedia = async (query: string): Promise<SearchResult[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/search`, {
+    const response = await api.get(`/search`, {
       params: { query }
     });
     return response.data;
@@ -60,7 +92,7 @@ export const searchMedia = async (query: string): Promise<SearchResult[]> => {
 };
 
 export const getMediaDetails = async (id: number, type: 'movie' | 'tv'): Promise<MediaDetails> => {
-  const response = await axios.get(`${API_BASE_URL}/details`, {
+  const response = await api.get(`/details`, {
     params: { id, type }
   });
   return response.data;
@@ -68,7 +100,7 @@ export const getMediaDetails = async (id: number, type: 'movie' | 'tv'): Promise
 
 export const getTVSeasons = async (id: number): Promise<TVSeason[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/seasons`, {
+    const response = await api.get(`/seasons`, {
       params: { id }
     });
     return response.data;
@@ -88,7 +120,7 @@ export const getTVSeasons = async (id: number): Promise<TVSeason[]> => {
 
 export const getTVEpisodes = async (id: number, season_number: number): Promise<TVEpisode[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/episodes`, {
+    const response = await api.get(`/episodes`, {
       params: { id, season_number }
     });
     return response.data;

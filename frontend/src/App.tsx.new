@@ -6,9 +6,7 @@ import SeasonList from './components/SeasonList'
 import EpisodeList from './components/EpisodeList';
 import Breadcrumb from './components/Breadcrumb';
 import ApiKeySetup from './components/ApiKeySetup';
-import SettingsModal from './components/SettingsModal';
 import type { BreadcrumbItem } from './components/Breadcrumb';
-import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
 import './components/IconLink.css'
 import { getTVSeasons, getTVEpisodes, getMediaDetails } from './api';
@@ -25,7 +23,6 @@ function App() {
   const [quality, setQuality] = useState<'720p' | '1080p' | '2160p'>('1080p');
   const [resetSearchCounter, setResetSearchCounter] = useState(0);
   const [apiKeyStatus, setApiKeyStatus] = useState<'checking' | 'missing' | 'present'>('checking');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   
   // Check if API key exists on component mount
@@ -164,23 +161,14 @@ function App() {
             <div className="max-w-6xl mx-auto">
               <div className="divide-y divide-gray-200">
                 <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center">
-                      <img 
-                        src="/mfr_icon.png" 
-                        alt="Media File Renamer" 
-                        className="h-10 w-10 mr-3 cursor-pointer icon-link" 
-                        onClick={resetSearch}
-                      />
-                      <h1 className="text-3xl font-bold">Media File Renamer</h1>
-                    </div>
-                    <button 
-                      onClick={() => setIsSettingsOpen(true)}
-                      className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                      title="Settings"
-                    >
-                      <Cog6ToothIcon className="h-6 w-6 text-gray-600" />
-                    </button>
+                  <div className="flex items-center justify-center mb-8">
+                    <img 
+                      src="/mfr_icon.png" 
+                      alt="Media File Renamer" 
+                      className="h-10 w-10 mr-3 cursor-pointer icon-link" 
+                      onClick={resetSearch}
+                    />
+                    <h1 className="text-3xl font-bold text-center">Media File Renamer</h1>
                   </div>
                   
                   {/* Breadcrumb navigation - now shown on all pages */}
@@ -237,9 +225,6 @@ function App() {
                         </div>
                       </div>
                     )}
-                    {view === 'episodes' && selectedItem && !selectedSeason && (
-                      <div className="text-center text-gray-500 py-4">Loading season information...</div>
-                    )}
                     {view === 'details' && selectedItem && (
                       <div className="flex flex-col min-h-[400px] h-full">
                         <div className="flex-1">
@@ -254,16 +239,6 @@ function App() {
               </div>
             </div>
           </div>
-          
-          {/* Settings Modal */}
-          <SettingsModal 
-            isOpen={isSettingsOpen} 
-            onClose={() => setIsSettingsOpen(false)}
-            onApiKeySaved={() => {
-              // Refresh the API key status
-              setApiKeyStatus(hasApiKey() ? 'present' : 'missing');
-            }}
-          />
         </div>
       )}
     </div>

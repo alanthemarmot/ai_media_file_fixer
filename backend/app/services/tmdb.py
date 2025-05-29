@@ -6,6 +6,19 @@ class TMDBService:
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.base_url = "https://api.themoviedb.org/3"
+        
+    async def test_api_key(self) -> bool:
+        """Tests if the API key is valid by making a request to a simple endpoint"""
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(
+                    f"{self.base_url}/configuration",
+                    params={"api_key": self.api_key},
+                )
+                response.raise_for_status()
+                return True
+            except Exception as e:
+                raise Exception(f"Invalid API key: {str(e)}")
 
     async def search_multi(self, query: str) -> List[Dict[str, Any]]:
         async with httpx.AsyncClient() as client:
