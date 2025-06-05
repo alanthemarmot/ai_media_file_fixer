@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="154" height="231" viewBox="0 0 154 231" xmlns="http://www.w3.org/2000/svg">
+  <rect width="154" height="231" fill="#f3f4f6"/>
+  <g fill="#9ca3af">
+    <path d="M77 90 C 65 90, 55 100, 55 112 C 55 124, 65 134, 77 134 C 89 134, 99 124, 99 112 C 99 100, 89 90, 77 90 Z"/>
+    <rect x="60" y="138" width="34" height="30" rx="2"/>
+    <path d="M50 75 L 104 75 C 110 75, 115 80, 115 86 L 115 156 C 115 162, 110 167, 104 167 L 50 167 C 44 167, 39 162, 39 156 L 39 86 C 39 80, 44 75, 50 75 Z M 50 80 L 104 80 L 104 160 L 50 160 L 50 80 Z"/>
+  </g>
+  <text x="77" y="190" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#4b5563">No Image</text>
+  <text x="77" y="210" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#4b5563">Available</text>
+</svg>
