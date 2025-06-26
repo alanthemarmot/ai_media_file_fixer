@@ -61,19 +61,22 @@ export default function EpisodeList({
     <div className="space-y-4">
       <div className="flex flex-col items-center mb-6">
         <div className="flex items-center gap-4">
-          {moviePosterPath && (
+          {moviePosterPath ? (
             <img
               src={`https://image.tmdb.org/t/p/w154${moviePosterPath}`}
               alt={`${seriesTitle}${seasonNumber ? ` - Season ${seasonNumber}` : ''}`}
               className="w-20 h-28 object-cover rounded shadow bg-white"
             />
-          )}
-          {!moviePosterPath && selectedSeason?.poster_path && (
+          ) : selectedSeason?.poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/w154${selectedSeason.poster_path}`}
               alt={`${seriesTitle} - Season ${seasonNumber}`}
               className="w-20 h-28 object-cover rounded shadow bg-white"
             />
+          ) : (
+            <div className="w-20 h-28 bg-gray-200 rounded shadow flex items-center justify-center text-gray-400 text-xs">
+              No Image
+            </div>
           )}
           <div className="flex flex-col items-center">
             <h3 className="text-2xl font-bold text-center">

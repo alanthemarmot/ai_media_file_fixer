@@ -35,7 +35,7 @@ trap cleanup EXIT
 
 # Start the backend server
 echo "Starting backend server..."
-cd "$BACKEND_DIR" && uvicorn app.main:app --reload --port 8000 &
+cd "$BACKEND_DIR" && uv run uvicorn app.main:app --reload --port 8000 &
 
 # Start the frontend development server and capture its output
 echo "Starting frontend server..."

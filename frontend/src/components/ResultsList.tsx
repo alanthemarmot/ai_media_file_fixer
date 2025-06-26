@@ -29,12 +29,16 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
           onClick={() => onSelect(result)}
           className="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {result.poster_path && (
+          {result.poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/w185${result.poster_path}`}
               alt={result.title}
               className="w-32 h-48 object-cover rounded mb-2"
             />
+          ) : (
+            <div className="w-32 h-48 bg-gray-200 rounded mb-2 flex items-center justify-center text-gray-400 text-xs">
+              No Image
+            </div>
           )}
           <span className="font-medium text-center text-lg">{result.title}</span>
           <span className="text-sm text-gray-500">{result.year}</span>

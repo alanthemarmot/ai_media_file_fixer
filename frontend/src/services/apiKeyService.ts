@@ -38,7 +38,22 @@ export const clearApiKey = (): void => {
 };
 
 /**
- * Check if the API key is valid by making a test request
+ * Check if the server has a TMDB API key configured
+ * @returns Promise that resolves to true if server has key, false otherwise
+ */
+export const checkServerApiKey = async (): Promise<boolean> => {
+  try {
+    const response = await fetch('/api/server-key-status');
+    const data = await response.json();
+    return data.has_key === true;
+  } catch (error) {
+    console.error('Error checking server API key:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if an API key is valid by making a test request
  * @param apiKey - The API key to validate
  * @returns Promise that resolves to true if valid, false if invalid
  */

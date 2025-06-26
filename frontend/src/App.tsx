@@ -11,7 +11,7 @@ import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
 import './components/IconLink.css'
-import { getTVSeasons, getTVEpisodes, getMediaDetails } from './api';
+import { getTVSeasons, getTVEpisodes, getMediaDetails, checkServerApiKeyStatus } from './api';
 import { hasApiKey } from './services/apiKeyService';
 
 function App() {
@@ -30,8 +30,21 @@ function App() {
   
   // Check if API key exists on component mount
   useEffect(() => {
-    const keyExists = hasApiKey();
-    setApiKeyStatus(keyExists ? 'present' : 'missing');
+    const checkApiKeyStatus = async () => {
+      // First check if server has an API key
+      const serverHasKey = await checkServerApiKeyStatus();
+      
+      if (serverHasKey) {
+        // Server has key, no need for user to provide one
+        setApiKeyStatus('present');
+      } else {
+        // Server doesn't have key, check if user has provided one locally
+        const userHasKey = hasApiKey();
+        setApiKeyStatus(userHasKey ? 'present' : 'missing');
+      }
+    };
+    
+    checkApiKeyStatus();
   }, []);
 
   const handleQualityChange = (newQuality: '720p' | '1080p' | '2160p') => {

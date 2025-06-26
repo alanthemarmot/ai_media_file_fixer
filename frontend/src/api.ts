@@ -82,6 +82,9 @@ export const searchMedia = async (query: string): Promise<SearchResult[]> => {
       if (error.code === 'ECONNREFUSED') {
         throw new Error('Unable to connect to the server. Is the backend running?');
       }
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes('API key required')) {
+        throw new Error('API key is required. Please configure your TMDB API key.');
+      }
       if (error.response?.status === 404) {
         throw new Error('Search endpoint not found. Please check the API URL.');
       }
@@ -129,5 +132,15 @@ export const getTVEpisodes = async (id: number, season_number: number): Promise<
       throw new Error(error.response?.data?.detail || 'An error occurred while fetching episodes.');
     }
     throw error;
+  }
+};
+
+export const checkServerApiKeyStatus = async (): Promise<boolean> => {
+  try {
+    const response = await api.get('/server-key-status');
+    return response.data.has_key;
+  } catch (error) {
+    console.error('Error checking server API key status:', error);
+    return false;
   }
 };
