@@ -76,7 +76,7 @@ export default function SettingsModal({ isOpen, onClose, onApiKeySaved }: Settin
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter your TMDB API key"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                   {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                   {successMessage && <p className="mt-2 text-sm text-green-600">{successMessage}</p>}

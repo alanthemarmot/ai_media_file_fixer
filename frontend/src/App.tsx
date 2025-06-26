@@ -189,10 +189,10 @@ function App() {
                     </div>
                     <button 
                       onClick={() => setIsSettingsOpen(true)}
-                      className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                      className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
                       title="Settings"
                     >
-                      <Cog6ToothIcon className="h-6 w-6 text-gray-600" />
+                      <Cog6ToothIcon className="h-6 w-6 text-white" />
                     </button>
                   </div>
                   

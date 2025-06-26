@@ -87,7 +87,7 @@ export default function ApiKeySetup({ onComplete, onSkip }: ApiKeySetupProps) {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="e.g., 1a2b3c4d5e6f7g8h9i0j..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-400"
             />
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
           </div>
