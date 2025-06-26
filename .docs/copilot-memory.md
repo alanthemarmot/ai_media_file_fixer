@@ -1,6 +1,25 @@
 # Copilot Memory - Media File Renamer
 
 ## Current Task 
+✅ COMPLETED: Removed extra text from TV series quality format section in EpisodeList.tsx
+
+### Issue Fixed:
+- In the EpisodeList.tsx component, extra text was appearing in the quality format selection section
+- The text "All episode filenames will update automatically" and directory info was cluttering the interface
+- This text was on lines 127-131 and was unnecessary for the user experience
+
+### Changes Made:
+1. **EpisodeList.tsx**:
+   - Removed the entire section containing "All episode filenames will update automatically"
+   - Removed the directory information display from the quality format section
+   - Cleaned up the quality format section to show only the radio buttons for quality selection
+
+### Results:
+- ✅ Quality format section now displays cleanly with just the quality radio buttons
+- ✅ Removed redundant text that was cluttering the interface
+- ✅ Cleaner, more focused user interface for episode quality selection
+
+### Previous Task:
 ✅ COMPLETED: Added title and year display to TV series views to match movie display format
 
 ### Changes Made:

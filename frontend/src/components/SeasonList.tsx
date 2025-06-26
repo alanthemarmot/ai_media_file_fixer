@@ -120,30 +120,30 @@ export default function SeasonList({
                   checked={selectedQuality === '2160p'} 
                   onChange={() => handleQualityChange('2160p')}
                 />
-                  <span className="ml-2">2160p</span>
-                </label>
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium text-gray-700">Generated directory name:</h3>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
-              >
-                {copied ? (
-                  <CheckIcon className="w-5 h-5 text-white" />
-                ) : (
-                  <ClipboardIcon className="w-5 h-5" />
-                )}
-                <span>{copied ? 'Copied!' : 'Copy'}</span>
-              </button>
-            </div>
-            <div className="p-3 bg-white rounded border border-gray-200 font-mono text-sm">
-              {directoryName}
+                <span className="ml-2">2160p</span>
+              </label>
             </div>
           </div>
-        )}
+          
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-sm font-medium text-gray-700">Generated directory name:</h3>
+            <button
+              onClick={copyToClipboard}
+              className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
+            >
+              {copied ? (
+                <CheckIcon className="w-5 h-5 text-white" />
+              ) : (
+                <ClipboardIcon className="w-5 h-5" />
+              )}
+              <span>{copied ? 'Copied!' : 'Copy'}</span>
+            </button>
+          </div>
+          <div className="p-3 bg-white rounded border border-gray-200 font-mono text-sm">
+            {directoryName}
+          </div>
+        </div>
+      )}
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {seasons.map((season) => (

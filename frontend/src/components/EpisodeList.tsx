@@ -127,14 +127,6 @@ export default function EpisodeList({
             </label>
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">All episode filenames will update automatically</p>
-          {network && (
-            <p className="text-sm text-gray-600">
-              Directory: <code className="bg-white p-1 rounded text-xs">{seriesTitle} [{network}]({selectedQuality})</code>
-            </p>
-          )}
-        </div>
       </div>
       
       <h3 className="text-lg font-semibold mb-2">Episodes</h3>
