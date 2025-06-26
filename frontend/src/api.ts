@@ -19,10 +19,14 @@ api.interceptors.request.use((config) => {
 
 export interface SearchResult {
   id: number;
-  media_type: 'movie' | 'tv';
-  title: string;
-  year: number;
+  media_type: 'movie' | 'tv' | 'person';
+  title?: string;
+  name?: string;
+  year?: number;
   poster_path?: string;
+  profile_path?: string;
+  known_for_department?: string;
+  popularity?: number;
 }
 
 export interface MovieDetails {
@@ -50,6 +54,34 @@ export interface TVEpisode {
   season_number: number;
   name: string;
   air_date?: string;
+}
+
+export interface PersonDetails {
+  id: number;
+  name: string;
+  known_for_department?: string;
+  profile_path?: string;
+  biography?: string;
+  birthday?: string;
+  place_of_birth?: string;
+}
+
+export interface FilmographyItem {
+  id: number;
+  media_type: 'movie' | 'tv';
+  title: string;
+  year?: number;
+  poster_path?: string;
+  character?: string;
+  job?: string;
+  department?: string;
+  role_type: 'cast' | 'crew';
+}
+
+export interface PersonFilmography {
+  person: PersonDetails;
+  cast: FilmographyItem[];
+  crew: FilmographyItem[];
 }
 
 export type MediaDetails = MovieDetails | TVShowDetails;
@@ -142,5 +174,17 @@ export const checkServerApiKeyStatus = async (): Promise<boolean> => {
   } catch (error) {
     console.error('Error checking server API key status:', error);
     return false;
+  }
+};
+
+export const getPersonFilmography = async (personId: number): Promise<PersonFilmography> => {
+  try {
+    const response = await api.get(`/person/${personId}/filmography`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.detail || 'An error occurred while fetching filmography.');
+    }
+    throw error;
   }
 };

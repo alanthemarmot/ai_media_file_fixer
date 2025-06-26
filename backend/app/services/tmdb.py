@@ -6,7 +6,7 @@ class TMDBService:
     def __init__(self, api_key: str):
         self.api_key = api_key
         self.base_url = "https://api.themoviedb.org/3"
-        
+
     async def test_api_key(self) -> bool:
         """Tests if the API key is valid by making a request to a simple endpoint"""
         async with httpx.AsyncClient() as client:
@@ -32,21 +32,32 @@ class TMDBService:
             # Format the response according to our API specification
             results = []
             for item in data.get("results", []):
-                if item["media_type"] not in ["movie", "tv"]:
+                if item["media_type"] not in ["movie", "tv", "person"]:
                     continue
 
-                result = {
-                    "id": item["id"],
-                    "media_type": item["media_type"],
-                    "title": item.get("title") or item.get("name"),
-                    "year": int(item.get("release_date", "")[:4])
-                    if item.get("release_date")
-                    else None,
-                    "poster_path": item.get("poster_path"),
-                }
-                if not result["year"] and item.get("first_air_date"):
-                    result["year"] = int(item["first_air_date"][:4])
-                results.append(result)
+                if item["media_type"] == "person":
+                    result = {
+                        "id": item["id"],
+                        "media_type": "person",
+                        "name": item.get("name"),
+                        "known_for_department": item.get("known_for_department"),
+                        "profile_path": item.get("profile_path"),
+                        "popularity": item.get("popularity", 0),
+                    }
+                    results.append(result)
+                else:
+                    result = {
+                        "id": item["id"],
+                        "media_type": item["media_type"],
+                        "title": item.get("title") or item.get("name"),
+                        "year": int(item.get("release_date", "")[:4])
+                        if item.get("release_date")
+                        else None,
+                        "poster_path": item.get("poster_path"),
+                    }
+                    if not result["year"] and item.get("first_air_date"):
+                        result["year"] = int(item["first_air_date"][:4])
+                    results.append(result)
 
             return results
 
@@ -143,3 +154,98 @@ class TMDBService:
                     }
                 )
             return episodes
+
+    async def get_person_filmography(self, person_id: int) -> Dict[str, Any]:
+        """Get a person's filmography including movies and TV shows"""
+        async with httpx.AsyncClient() as client:
+            # Get person details
+            person_response = await client.get(
+                f"{self.base_url}/person/{person_id}", params={"api_key": self.api_key}
+            )
+            person_response.raise_for_status()
+            person_data = person_response.json()
+
+            # Get combined credits (movies and TV)
+            credits_response = await client.get(
+                f"{self.base_url}/person/{person_id}/combined_credits",
+                params={"api_key": self.api_key},
+            )
+            credits_response.raise_for_status()
+            credits_data = credits_response.json()
+
+            # Process cast credits
+            cast_credits = []
+            for credit in credits_data.get("cast", []):
+                if credit.get("media_type") in ["movie", "tv"]:
+                    item = {
+                        "id": credit["id"],
+                        "media_type": credit["media_type"],
+                        "title": credit.get("title") or credit.get("name"),
+                        "character": credit.get("character"),
+                        "poster_path": credit.get("poster_path"),
+                        "role_type": "cast",
+                    }
+
+                    # Add year/date
+                    if credit["media_type"] == "movie":
+                        item["year"] = (
+                            int(credit["release_date"][:4])
+                            if credit.get("release_date")
+                            else None
+                        )
+                    else:  # TV
+                        item["year"] = (
+                            int(credit["first_air_date"][:4])
+                            if credit.get("first_air_date")
+                            else None
+                        )
+
+                    cast_credits.append(item)
+
+            # Process crew credits
+            crew_credits = []
+            for credit in credits_data.get("crew", []):
+                if credit.get("media_type") in ["movie", "tv"]:
+                    item = {
+                        "id": credit["id"],
+                        "media_type": credit["media_type"],
+                        "title": credit.get("title") or credit.get("name"),
+                        "job": credit.get("job"),
+                        "department": credit.get("department"),
+                        "poster_path": credit.get("poster_path"),
+                        "role_type": "crew",
+                    }
+
+                    # Add year/date
+                    if credit["media_type"] == "movie":
+                        item["year"] = (
+                            int(credit["release_date"][:4])
+                            if credit.get("release_date")
+                            else None
+                        )
+                    else:  # TV
+                        item["year"] = (
+                            int(credit["first_air_date"][:4])
+                            if credit.get("first_air_date")
+                            else None
+                        )
+
+                    crew_credits.append(item)
+
+            # Sort both by year (newest first), handling None values
+            cast_credits.sort(key=lambda x: x["year"] or 0, reverse=True)
+            crew_credits.sort(key=lambda x: x["year"] or 0, reverse=True)
+
+            return {
+                "person": {
+                    "id": person_data["id"],
+                    "name": person_data["name"],
+                    "known_for_department": person_data.get("known_for_department"),
+                    "profile_path": person_data.get("profile_path"),
+                    "biography": person_data.get("biography"),
+                    "birthday": person_data.get("birthday"),
+                    "place_of_birth": person_data.get("place_of_birth"),
+                },
+                "cast": cast_credits,
+                "crew": crew_credits,
+            }

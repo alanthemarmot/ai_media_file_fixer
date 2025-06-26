@@ -128,3 +128,28 @@ async def get_tv_episodes(
         return episodes
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/person/{person_id}/filmography")
+async def get_person_filmography(
+    person_id: int, x_api_key: Optional[str] = Header(None)
+):
+    """Get a person's filmography including movies and TV shows"""
+    try:
+        # Use the provided API key if available, otherwise use the server's key
+        api_key = x_api_key or settings.TMDB_API_KEY
+
+        if not api_key:
+            raise HTTPException(
+                status_code=400,
+                detail="API key required. Please provide API key in X-API-Key header.",
+            )
+
+        service = TMDBService(api_key=api_key) if x_api_key else tmdb_service
+        if not service:
+            service = TMDBService(api_key=api_key)
+
+        filmography = await service.get_person_filmography(person_id)
+        return filmography
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -1,6 +1,155 @@
 # Copilot Memory - Media File Renamer
 
-## Current Task 
+## Current Task
+✅ COMPLETED: Set default minimum width for the app to prevent cramped layout
+
+### Issue Fixed:
+- App content was appearing very narrow on wider screens
+- Search input box text looked cut off due to cramped layout
+- Home page content was too small and difficult to use
+
+### Changes Made:
+1. **App.tsx**:
+   - Added `min-w-[800px]` to outer container to ensure minimum 800px width
+   - Changed inner content from `max-w-6xl` to `max-w-5xl` with `min-w-[700px]`
+   - This provides better responsive behavior across different screen sizes
+
+### Results:
+- ✅ App now maintains readable width on all screen sizes
+- ✅ Search input no longer appears cramped
+- ✅ Content stays consistently sized and easy to use
+- ✅ Better user experience across desktop and tablet sizes
+
+### Previous Task:
+✅ COMPLETED: Enhanced filmography categorization and breadcrumb navigation
+
+### Changes Made:
+
+#### 1. **Enhanced Filmography Component**:
+- ✅ Completely rewrote `Filmography.tsx` with intelligent categorization based on person type
+- ✅ **Actor categories**: Films, TV Shows, Other (crew work, documentaries, appearances)
+- ✅ **Director/Crew categories**: Directed, Produced, Other (acting work, other departments)
+- ✅ Added tabbed interface for better organization
+- ✅ Dynamic tab creation based on available content
+- ✅ Improved visual consistency with the rest of the app
+
+#### 2. **Enhanced Breadcrumb Navigation**:
+- ✅ Added `personContext` state to track person when navigating from filmography
+- ✅ Updated breadcrumbs to include person name when viewing items from their filmography
+- ✅ Clicking person name in breadcrumbs returns to their filmography
+- ✅ Updated reset functions to clear person context appropriately
+- ✅ Added person context handling in `handleFilmographyItemSelect()`
+
+#### 3. **Smart Navigation Logic**:
+- ✅ When selecting item from filmography: person context is preserved
+- ✅ When selecting person directly: person context is cleared
+- ✅ Breadcrumb shows: Home → Search Results → [Person Name] → [Movie/TV Show]
+- ✅ User can navigate back to person without re-searching
+
+### User Experience Improvements:
+- **Better Organization**: Content categorized meaningfully by person type
+- **Intuitive Navigation**: Always know where you are and how to get back
+- **Faster Workflow**: No need to re-search for people when exploring their work
+- **Professional Interface**: Clean tabbed layout matches app design
+
+### Technical Implementation:
+- Dynamic categorization based on `known_for_department` and content volume
+- Preserved all existing functionality while adding new features
+- State management for person context tracking
+- Async breadcrumb navigation with proper loading states
+
+### Previous Task Completed:
+✅ COMPLETED: Update home page to reflect new search capabilities (TV shows, movies, and actors/directors)
+
+### Changes Made:
+1. **README.md Updates**:
+   - ✅ Updated main description to mention people (actors/directors) search
+   - ✅ Added new features: Universal Search, Multi-Tab Results, Person Filmography, Smart Navigation
+   - ✅ Updated "How It Works" section to include person search workflow
+   - ✅ Enhanced project structure to show key new components
+
+2. **Frontend Updates**:
+   - ✅ Updated SearchBar placeholder text from "Search for a movie or TV show..." to "Search for movies, TV shows, or people..."
+   - ✅ Updated HTML page title from "Media File Renamer" to "Media File Renamer - Search Movies, TV Shows & People"
+
+3. **User Experience Improvements**:
+   - ✅ Home page now accurately reflects the comprehensive search capabilities
+   - ✅ Users will understand they can search for people, not just media content
+   - ✅ Documentation is complete and accurate for the current feature set
+
+# Copilot Memory - Media File Renamer
+
+## Current Task
+🔄 UPDATE HOME PAGE: Update home page to reflect new search capabilities (TV shows, movies, and actors/directors)
+
+### Previous Task Completed:
+✅ COMPLETED: Add actor/director search functionality to integrated search
+
+### Requirements:
+- Search for TV/film and actor/director should be integrated into the same search bar ✅
+- Results for actor/director list their filmography/TV shows in chronological order with newest first ✅
+- Breadcrumbs should be updated to reflect moving through the pages ✅
+
+### Implementation Completed:
+
+#### Backend Changes ✅ COMPLETED:
+1. **TMDB Service Updates**:
+   - ✅ Updated `search_multi()` to include person results with media_type: "person"
+   - ✅ Added `get_person_filmography()` method that returns person details, cast credits, and crew credits
+   - ✅ Filmography results sorted by year (newest first) with proper handling of null years
+   - ✅ Includes detailed person info: biography, birthday, place of birth, etc.
+
+2. **API Routes**:
+   - ✅ Added `/person/{person_id}/filmography` endpoint
+   - ✅ All endpoints tested and working correctly
+
+#### Frontend Changes ✅ COMPLETED:
+1. **Type Definitions**:
+   - ✅ Updated `SearchResult` interface to support person results
+   - ✅ Added `PersonDetails`, `FilmographyItem`, `PersonFilmography` interfaces
+   - ✅ Added `getPersonFilmography()` API function
+
+2. **New Components**:
+   - ✅ Created `PersonResultsList.tsx` - displays person search results
+   - ✅ Created `Filmography.tsx` - displays person's filmography with cast/crew sections grouped by department
+   - ✅ Updated `ResultsList.tsx` to include People tab when person results exist
+
+3. **App Integration**:
+   - ✅ Added filmography state management to App.tsx
+   - ✅ Updated view state to include 'filmography' view
+   - ✅ Added `handleFilmographyItemSelect()` to navigate from filmography to movie/TV details
+   - ✅ Updated breadcrumbs to handle person navigation
+   - ✅ Added CSS utilities for line-clamp classes
+   - ✅ Removed unused functions and fixed compilation errors
+
+#### Comprehensive Testing ✅:
+- ✅ Backend: Mixed search (batman) returns movies, TV shows, and people
+- ✅ Backend: Tom Hanks returns 251 cast + 78 crew entries, sorted chronologically
+- ✅ Backend: Christopher Nolan returns 19 directing credits, sorted chronologically
+- ✅ Backend: Regular movie/TV search still works perfectly
+- ✅ Frontend: No compilation errors, all components properly integrated
+- ✅ Frontend: Person tab appears only when person results exist
+
+### Features Delivered:
+1. **Integrated Search**: Single search bar handles movies, TV shows, and people
+2. **Dynamic Tabs**: Results show 2-3 tabs (TV Shows, Movies, People) based on search results
+3. **Person Filmography**: Clicking a person shows their complete filmography
+4. **Chronological Sorting**: All filmography sorted by year (newest first)
+5. **Department Grouping**: Crew credits grouped by department (Directing, Production, Writing, Other)
+6. **Navigation Flow**: Can navigate from person → filmography → specific movie/TV show → details
+7. **Updated Breadcrumbs**: Breadcrumbs reflect current navigation path
+8. **Professional UI**: Clean, responsive design matching existing app style
+
+### User Experience:
+- Search "Tom Hanks" → See People tab → Click Tom Hanks → See filmography with latest projects first
+- Search "Christopher Nolan" → See People tab → Click Christopher Nolan → See directing credits first
+- From filmography, click any movie/TV show → Navigate to that item's details
+- Breadcrumbs always show current location and allow navigation back
+
+### Next Task Ready:
+The actor/director search functionality is now fully integrated and working. Users can search for people alongside movies and TV shows, view their filmography in chronological order, and navigate seamlessly between different content types.
+
+## Previous Task
 ✅ COMPLETED: Removed extra text from TV series quality format section in EpisodeList.tsx
 
 ### Issue Fixed:

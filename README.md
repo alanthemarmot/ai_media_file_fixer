@@ -1,12 +1,14 @@
 # Media File Renamer
 
-A lightweight local web app to help you search The Movie Database (TMDb), select a show or movie, and generate a formatted naming string for your media files. Designed for users who want consistent, media server-friendly file names for TV shows and movies.
+A lightweight local web app to help you search The Movie Database (TMDb), select shows, movies, or explore actor/director filmographies, and generate formatted naming strings for your media files. Designed for users who want consistent, media server-friendly file names for TV shows and movies.
 
 ---
 
 ## Features
-- **Search**: Query TMDb for TV shows or movies by title.
-- **Select**: Choose from a list of search results (TV or Movie, with year).
+- **Universal Search**: Query TMDb for TV shows, movies, or people (actors/directors) by name.
+- **Multi-Tab Results**: Organized results with separate tabs for TV Shows, Movies, and People.
+- **Person Filmography**: Browse an actor's or director's complete filmography, sorted chronologically.
+- **Smart Navigation**: Navigate from person filmography to specific shows/movies with breadcrumb navigation.
 - **Display Naming**: Instantly generate a naming string for the selected item:
   - TV Show: `S{{season:02d}}E{{episode:02d}} - {{Episode Title}} ({{Quality}})`
   - Movie: `{{Movie Title}} [{{Year}}] ({{Quality}})`
@@ -24,11 +26,12 @@ A lightweight local web app to help you search The Movie Database (TMDb), select
 
 ## How It Works
 1. **Start the app** (see below)
-2. Enter a movie or TV show title in the search bar
-3. Select the correct result from the list
-4. The app fetches details (season, episode, year, etc.)
-5. A suggested filename is generated and displayed
-6. Click "Copy" to copy the filename to your clipboard
+2. Enter a movie, TV show, or person's name in the search bar
+3. Select from organized results in TV Shows, Movies, or People tabs
+4. **For TV/Movies**: The app fetches details (season, episode, year, etc.) and generates a suggested filename
+5. **For People**: Browse their complete filmography and click on any item to get naming details
+6. Navigate using breadcrumbs to move between search results, person pages, and media details
+7. Click "Copy" to copy the filename to your clipboard
 
 ---
 
@@ -77,7 +80,19 @@ A lightweight local web app to help you search The Movie Database (TMDb), select
 ```
 media_file_renamer/
 ├── backend/           # FastAPI backend
+│   ├── app/
+│   │   ├── services/
+│   │   │   └── tmdb.py     # TMDb API integration with person search
+│   │   └── api/
+│   │       └── routes.py   # API endpoints including /person/{id}/filmography
 ├── frontend/          # React frontend
+│   └── src/
+│       └── components/
+│           ├── SearchBar.tsx         # Universal search (movies, TV, people)
+│           ├── ResultsList.tsx       # Tabbed results display
+│           ├── PersonResultsList.tsx # Person search results
+│           ├── Filmography.tsx       # Person filmography display
+│           └── Breadcrumb.tsx        # Navigation breadcrumbs
 ├── start.sh           # Startup script (uses uv for Python env)
 ├── update_dependencies.sh  # Script to update Python dependencies
 ├── requirements.txt   # Python dependencies
