@@ -8,6 +8,7 @@ const DEFAULT_QUALITY = '1080p';
 interface EpisodeListProps {
   episodes: TVEpisode[];
   seriesTitle: string;
+  seriesYear?: number;
   seasonNumber: number;
   quality?: '720p' | '1080p' | '2160p';
   selectedSeason?: {
@@ -21,6 +22,7 @@ interface EpisodeListProps {
 export default function EpisodeList({ 
   episodes, 
   seriesTitle, 
+  seriesYear,
   seasonNumber, 
   quality = DEFAULT_QUALITY as '1080p',
   selectedSeason, 
@@ -80,7 +82,7 @@ export default function EpisodeList({
           )}
           <div className="flex flex-col items-center">
             <h3 className="text-2xl font-bold text-center">
-              {seriesTitle} {seasonNumber ? `- Season ${seasonNumber}` : ''}
+              {seriesTitle} {seriesYear ? `[${seriesYear}]` : ''} {seasonNumber ? `- Season ${seasonNumber}` : ''}
             </h3>
             {network && (
               <span className="text-sm text-gray-500 font-medium mt-1">{network}</span>

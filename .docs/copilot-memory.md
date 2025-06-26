@@ -1,7 +1,46 @@
 # Copilot Memory - Media File Renamer
 
+## Current Task 
+✅ COMPLETED: Added title and year display to TV series views to match movie display format
+
+### Changes Made:
+1. **SeasonList.tsx**:
+   - Added `seriesYear?: number` to props interface
+   - Added "Media Details" section showing Title, Year, and Network
+   - Positioned between "Select a Season" header and quality selector
+   - Uses same styling as movie Media Details section (bg-gray-50, etc.)
+
+2. **EpisodeList.tsx**:
+   - Added `seriesYear?: number` to props interface  
+   - Updated header to show title with year in brackets: "Title [Year] - Season X"
+   - ✅ REMOVED Media Details section per user request - only shows in header now
+
+3. **App.tsx**:
+   - Updated SeasonList component call to pass `seriesYear={selectedItem.year}`
+   - Updated EpisodeList component call to pass `seriesYear={selectedItem.year}`
+
+### Results:
+- ✅ Season selection page: Shows Media Details section with Title, Year, Network
+- ✅ Episode list page: Shows title and year in header only, no Media Details section
+- ✅ Maintains existing functionality for quality selection and network display
+
+## Previous TasksMedia File Renamer
+
 ## Current Task
-✅ COMPLETED: Implemented API key management - check for server-side .env API key first, only prompt user if missing.
+Adding title and year display to TV series views to match movie display format
+
+Need to modify:
+1. **SeasonList.tsx**: Add "Media Details" section showing title and year like movies do
+2. **EpisodeList.tsx**: Add series title and year display similar to movies
+
+The TV series should show:
+- Title: [Series Name]  
+- Year: [Year]
+- Select quality format section (already exists)
+
+This should match the movie display format shown in DisplayArea.tsx which has:
+- Title and year in header
+- Media Details section with Title: and Year: fields
 
 ## API Key Management Implementation
 - Backend now checks for TMDB_API_KEY in .env file first

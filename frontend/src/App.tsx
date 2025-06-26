@@ -221,6 +221,7 @@ function App() {
                             onSelect={handleSeasonSelect}
                             selectedSeason={selectedSeason?.season_number}
                             seriesTitle={selectedItem.title}
+                            seriesYear={selectedItem.year}
                             network={selectedItem.network}
                             quality={quality}
                             onQualityChange={handleQualityChange}
@@ -237,6 +238,7 @@ function App() {
                             <EpisodeList
                               episodes={episodes}
                               seriesTitle={selectedItem.title}
+                              seriesYear={selectedItem.year}
                               seasonNumber={selectedSeason.season_number}
                               quality={quality}
                               selectedSeason={selectedSeason}

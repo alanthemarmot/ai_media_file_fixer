@@ -14,6 +14,7 @@ interface SeasonListProps {
   onSelect: (season: TVSeason) => void;
   selectedSeason?: number;
   seriesTitle?: string;
+  seriesYear?: number;
   network?: string;
   onQualityChange?: (quality: '720p' | '1080p' | '2160p') => void;
   quality?: '720p' | '1080p' | '2160p';
@@ -24,6 +25,7 @@ export default function SeasonList({
   onSelect, 
   selectedSeason, 
   seriesTitle = '', 
+  seriesYear,
   network = '',
   onQualityChange,
   quality = '1080p'
@@ -60,6 +62,30 @@ export default function SeasonList({
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold mb-2">Select a Season</h3>
+      
+      {/* Media Details section - similar to movie display */}
+      {seriesTitle && (
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Media Details</h2>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Title:</span> {seriesTitle}
+              </p>
+              {seriesYear && (
+                <p>
+                  <span className="font-medium">Year:</span> {seriesYear}
+                </p>
+              )}
+              {network && (
+                <p>
+                  <span className="font-medium">Network:</span> {network}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       
       {seriesTitle && (
         <div className="mb-6 bg-gray-50 p-4 rounded-lg">
