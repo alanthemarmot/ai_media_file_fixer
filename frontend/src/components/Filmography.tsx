@@ -9,12 +9,30 @@ interface FilmographyProps {
 export default function Filmography({ filmography, onItemSelect }: FilmographyProps) {
   const [activeTab, setActiveTab] = useState<string>('primary');
 
-  // Determine if this person is primarily an actor
+  // Determine person type
   const isActor = filmography.person.known_for_department === 'Acting' || filmography.cast.length > filmography.crew.length;
+  const isComposer = filmography.person.known_for_department === 'Sound';
 
   // Categorize content based on person type
   const categorizeContent = () => {
-    if (isActor) {
+    if (isComposer) {
+      // Composer categories: Composer, Other
+      const composerWork = filmography.crew.filter(item => 
+        item.department === 'Sound' || (item.job && item.job.toLowerCase().includes('composer'))
+      );
+      const other = [
+        ...filmography.cast, // Any acting work
+        ...filmography.crew.filter(item => 
+          item.department !== 'Sound' && !(item.job && item.job.toLowerCase().includes('composer'))
+        )
+      ];
+
+      return {
+        primary: { title: `Composer (${composerWork.length})`, items: composerWork },
+        secondary: other.length > 0 ? { title: `Other (${other.length})`, items: other } : null,
+        tertiary: null
+      };
+    } else if (isActor) {
       // Actor categories: Film, TV, Other
       const films = filmography.cast.filter(item => item.media_type === 'movie');
       const tv = filmography.cast.filter(item => item.media_type === 'tv');
@@ -94,7 +112,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
 
   const availableTabs = [
     { key: 'primary', ...categories.primary },
-    { key: 'secondary', ...categories.secondary },
+    ...(categories.secondary ? [{ key: 'secondary', ...categories.secondary }] : []),
     ...(categories.tertiary ? [{ key: 'tertiary', ...categories.tertiary }] : [])
   ];
 
@@ -117,7 +135,9 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
           <div className="flex-1">
             <h2 className="text-3xl font-bold text-gray-800 mb-2">{filmography.person.name}</h2>
             {filmography.person.known_for_department && (
-              <p className="text-lg text-blue-600 mb-2">{filmography.person.known_for_department}</p>
+              <p className="text-lg text-blue-600 mb-2">
+                {filmography.person.known_for_department === 'Sound' ? 'Composer' : filmography.person.known_for_department}
+              </p>
             )}
             {filmography.person.birthday && (
               <p className="text-sm text-gray-600 mb-1">

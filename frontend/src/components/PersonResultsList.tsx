@@ -35,7 +35,9 @@ export default function PersonResultsList({ results, onSelect }: PersonResultsLi
           )}
           <span className="font-medium text-center text-lg">{result.name}</span>
           {result.known_for_department && (
-            <span className="text-sm text-blue-600">{result.known_for_department}</span>
+            <span className="text-sm text-blue-600">
+              {result.known_for_department === 'Sound' ? 'Composer' : result.known_for_department}
+            </span>
           )}
         </button>
       ))}
