@@ -1,6 +1,36 @@
 # Copilot Memory - Media File Renamer
 
 ## Current Task
+✅ COMPLETED: Centered cast display and increased cast limit from 8 to 15 actors
+
+### Issues Resolved:
+1. **Cast Not Centered**: Cast buttons were left-aligned instead of centered like directors/composers
+2. **Limited Cast Display**: TV shows and movies only showed 8 actors maximum when there are often more main cast members
+
+### Changes Made:
+
+1. **Frontend (DisplayArea.tsx)**: ✅ Centered cast display
+   - Added `justify-center` class to both cast sections (TV show and movie)
+   - Now matches the centered layout of directors and composers
+   - Applied to both: `<div className="flex flex-wrap gap-2 mt-1 justify-center">`
+
+2. **Backend (tmdb.py)**: ✅ Increased cast limit 
+   - Changed cast limit from 8 to 15 actors for both movies and TV shows
+   - Updated both sections: `for actor in credits_data.get("cast", [])[:15]:`
+   - Now shows up to 15 main cast members instead of just 8
+
+### Implementation Details:
+- **Consistent Styling**: Cast now has same centered layout as other clickable elements
+- **Better Representation**: Shows more of the main cast for better context
+- **User Experience**: Users can see and interact with more cast members
+- **Performance**: Still limited to prevent excessive UI clutter
+
+### User Experience Improvements:
+- **Visual Consistency**: All clickable person elements (cast, directors, composers) now have centered alignment
+- **More Complete Cast**: Users can see up to 15 actors instead of being limited to 8
+- **Professional Layout**: Clean, centered presentation matches the app's design standards
+
+## Previous Task
 ✅ COMPLETED: Updated directors and composers to be clickable links with same styling as cast
 
 ### Implementation Complete:

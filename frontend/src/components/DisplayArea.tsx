@@ -148,7 +148,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             {details.cast && details.cast.length > 0 && (
               <div>
                 <span className="font-medium">Cast:</span>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-2 mt-1 justify-center">
                   {details.cast.map((actor) => (
                     <button
                       key={actor.id}
@@ -220,7 +220,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             {details.cast && details.cast.length > 0 && (
               <div>
                 <span className="font-medium">Cast:</span>
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="flex flex-wrap gap-2 mt-1 justify-center">
                   {details.cast.map((actor) => (
                     <button
                       key={actor.id}

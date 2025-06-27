@@ -102,9 +102,9 @@ class TMDBService:
                 credits_response.raise_for_status()
                 credits_data = credits_response.json()
 
-                # Extract top cast (limit to 8 actors)
+                # Extract top cast (limit to 15 actors)
                 cast = []
-                for actor in credits_data.get("cast", [])[:8]:
+                for actor in credits_data.get("cast", [])[:15]:
                     cast.append(
                         {
                             "id": actor["id"],
@@ -168,9 +168,9 @@ class TMDBService:
                 credits_response.raise_for_status()
                 credits_data = credits_response.json()
 
-                # Extract top cast (limit to 8 actors)
+                # Extract top cast (limit to 15 actors)
                 cast = []
-                for actor in credits_data.get("cast", [])[:8]:
+                for actor in credits_data.get("cast", [])[:15]:
                     cast.append(
                         {
                             "id": actor["id"],
