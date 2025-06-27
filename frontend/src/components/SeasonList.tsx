@@ -150,7 +150,7 @@ export default function SeasonList({
             <button
               key={season.season_number}
               onClick={() => onSelect(season)}
-              className={`flex flex-col items-center p-2 border rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedSeason === season.season_number ? 'border-blue-500 ring-2 ring-blue-400' : 'border-gray-200'}`}
+              className={`flex flex-col items-center p-2 border rounded-lg shadow bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedSeason === season.season_number ? 'border-blue-500 ring-2 ring-blue-400' : 'border-gray-200'}`}
             >
               {season.poster_path ? (
                 <img

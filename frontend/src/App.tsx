@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import SearchBar from './components/SearchBar'
+import EnhancedSearchBar from './components/EnhancedSearchBar'
 import ResultsList from './components/ResultsList'
 import DisplayArea from './components/DisplayArea'
 import SeasonList from './components/SeasonList'
@@ -278,9 +278,9 @@ function App() {
                   {/* Breadcrumb navigation - now shown on all pages */}
                   <Breadcrumb items={getBreadcrumbItems()} />
                   
-                  {/* Show SearchBar only on home/results page */}
+                  {/* Show EnhancedSearchBar only on home/results page */}
                   {view === 'results' && (
-                    <SearchBar 
+                    <EnhancedSearchBar 
                       onSearch={handleSearch} 
                       resetTrigger={resetSearchCounter} 
                       onReset={resetSearch} 
