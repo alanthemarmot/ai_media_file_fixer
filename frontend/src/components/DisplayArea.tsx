@@ -5,9 +5,10 @@ import { type SearchResult, type MediaDetails, getMediaDetails } from '../api';
 interface DisplayAreaProps {
   selectedItem: SearchResult | null;
   quality?: string;
+  onPersonSelect?: (personId: number, personName: string) => void;
 }
 
-export default function DisplayArea({ selectedItem, quality = '1080p' }: DisplayAreaProps) {
+export default function DisplayArea({ selectedItem, quality = '1080p', onPersonSelect }: DisplayAreaProps) {
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +23,18 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
       return;
     }
 
+    // Only fetch details for movies and TV shows, not people
+    if (selectedItem.media_type === 'person') {
+      setDetails(null);
+      setError(null);
+      return;
+    }
+
     const fetchDetails = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const mediaDetails = await getMediaDetails(selectedItem.id, selectedItem.media_type);
+        const mediaDetails = await getMediaDetails(selectedItem.id, selectedItem.media_type as 'movie' | 'tv');
         setDetails(mediaDetails);
       } catch (err) {
         setError('Failed to load media details');
@@ -132,6 +140,60 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
               <span className="font-medium">Episode:</span> S{details.season.toString().padStart(2, '0')}E
               {details.episode.toString().padStart(2, '0')} - {details.episode_title}
             </p>
+            {details.genres && details.genres.length > 0 && (
+              <p>
+                <span className="font-medium">Genres:</span> {details.genres.join(', ')}
+              </p>
+            )}
+            {details.cast && details.cast.length > 0 && (
+              <div>
+                <span className="font-medium">Cast:</span>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {details.cast.map((actor) => (
+                    <button
+                      key={actor.id}
+                      onClick={() => onPersonSelect?.(actor.id, actor.name)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      title={actor.character ? `as ${actor.character}` : undefined}
+                    >
+                      {actor.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(details.crew?.directors || details.crew?.composers) && (
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {details.crew?.directors && (
+                  <>
+                    <span className="font-medium">Director{(details.crew.directors.length > 1) ? 's' : ''}:</span>
+                    {details.crew.directors.map((director) => (
+                      <button
+                        key={`director-${director.id}`}
+                        onClick={() => onPersonSelect?.(director.id, director.name)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      >
+                        {director.name}
+                      </button>
+                    ))}
+                  </>
+                )}
+                {details.crew?.composers && (
+                  <>
+                    <span className="font-medium">Composer{(details.crew.composers.length > 1) ? 's' : ''}:</span>
+                    {details.crew.composers.map((composer) => (
+                      <button
+                        key={`composer-${composer.id}`}
+                        onClick={() => onPersonSelect?.(composer.id, composer.name)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      >
+                        {composer.name}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
               <code className="block bg-gray-100 p-2 rounded mt-1">
@@ -150,6 +212,60 @@ export default function DisplayArea({ selectedItem, quality = '1080p' }: Display
             <p>
               <span className="font-medium">Year:</span> {details.year}
             </p>
+            {details.genres && details.genres.length > 0 && (
+              <p>
+                <span className="font-medium">Genres:</span> {details.genres.join(', ')}
+              </p>
+            )}
+            {details.cast && details.cast.length > 0 && (
+              <div>
+                <span className="font-medium">Cast:</span>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {details.cast.map((actor) => (
+                    <button
+                      key={actor.id}
+                      onClick={() => onPersonSelect?.(actor.id, actor.name)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      title={actor.character ? `as ${actor.character}` : undefined}
+                    >
+                      {actor.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {(details.crew?.directors || details.crew?.composers) && (
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {details.crew?.directors && (
+                  <>
+                    <span className="font-medium">Director{(details.crew.directors.length > 1) ? 's' : ''}:</span>
+                    {details.crew.directors.map((director) => (
+                      <button
+                        key={`director-${director.id}`}
+                        onClick={() => onPersonSelect?.(director.id, director.name)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      >
+                        {director.name}
+                      </button>
+                    ))}
+                  </>
+                )}
+                {details.crew?.composers && (
+                  <>
+                    <span className="font-medium">Composer{(details.crew.composers.length > 1) ? 's' : ''}:</span>
+                    {details.crew.composers.map((composer) => (
+                      <button
+                        key={`composer-${composer.id}`}
+                        onClick={() => onPersonSelect?.(composer.id, composer.name)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      >
+                        {composer.name}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
             {/* Quality selector for movies */}
             <div className="mb-3">
               <label className="text-sm font-medium text-gray-700 block mb-2">Select quality format:</label>

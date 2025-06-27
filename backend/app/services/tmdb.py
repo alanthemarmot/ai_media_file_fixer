@@ -87,16 +87,71 @@ class TMDBService:
     async def get_details(self, id: int, media_type: str) -> Dict[str, Any]:
         async with httpx.AsyncClient() as client:
             if media_type == "movie":
+                # Get movie details
                 response = await client.get(
                     f"{self.base_url}/movie/{id}", params={"api_key": self.api_key}
                 )
                 response.raise_for_status()
                 data = response.json()
+
+                # Get movie credits (cast and crew)
+                credits_response = await client.get(
+                    f"{self.base_url}/movie/{id}/credits",
+                    params={"api_key": self.api_key},
+                )
+                credits_response.raise_for_status()
+                credits_data = credits_response.json()
+
+                # Extract top cast (limit to 8 actors)
+                cast = []
+                for actor in credits_data.get("cast", [])[:8]:
+                    cast.append(
+                        {
+                            "id": actor["id"],
+                            "name": actor["name"],
+                            "character": actor.get("character"),
+                            "profile_path": actor.get("profile_path"),
+                        }
+                    )
+
+                # Extract key crew (director, composer, etc.)
+                directors = []
+                composers = []
+                for person in credits_data.get("crew", []):
+                    job = person.get("job")
+                    if job == "Director":
+                        directors.append(
+                            {
+                                "id": person["id"],
+                                "name": person["name"],
+                                "profile_path": person.get("profile_path"),
+                            }
+                        )
+                    elif job in ["Original Music Composer", "Music", "Composer"]:
+                        composers.append(
+                            {
+                                "id": person["id"],
+                                "name": person["name"],
+                                "profile_path": person.get("profile_path"),
+                            }
+                        )
+
+                crew = {
+                    "directors": directors if directors else None,
+                    "composers": composers if composers else None,
+                }
+
+                # Extract genres
+                genres = [genre["name"] for genre in data.get("genres", [])]
+
                 return {
                     "title": data["title"],
                     "year": int(data["release_date"][:4])
                     if data.get("release_date")
                     else None,
+                    "genres": genres,
+                    "cast": cast,
+                    "crew": crew,
                 }
             else:  # TV Show
                 # Get show details
@@ -105,6 +160,55 @@ class TMDBService:
                 )
                 response.raise_for_status()
                 data = response.json()
+
+                # Get TV show credits (cast and crew)
+                credits_response = await client.get(
+                    f"{self.base_url}/tv/{id}/credits", params={"api_key": self.api_key}
+                )
+                credits_response.raise_for_status()
+                credits_data = credits_response.json()
+
+                # Extract top cast (limit to 8 actors)
+                cast = []
+                for actor in credits_data.get("cast", [])[:8]:
+                    cast.append(
+                        {
+                            "id": actor["id"],
+                            "name": actor["name"],
+                            "character": actor.get("character"),
+                            "profile_path": actor.get("profile_path"),
+                        }
+                    )
+
+                # Extract key crew (director, composer, etc.)
+                directors = []
+                composers = []
+                for person in credits_data.get("crew", []):
+                    job = person.get("job")
+                    if job in ["Director", "Series Director"]:
+                        directors.append(
+                            {
+                                "id": person["id"],
+                                "name": person["name"],
+                                "profile_path": person.get("profile_path"),
+                            }
+                        )
+                    elif job in ["Original Music Composer", "Music", "Composer"]:
+                        composers.append(
+                            {
+                                "id": person["id"],
+                                "name": person["name"],
+                                "profile_path": person.get("profile_path"),
+                            }
+                        )
+
+                crew = {
+                    "directors": directors if directors else None,
+                    "composers": composers if composers else None,
+                }
+
+                # Extract genres
+                genres = [genre["name"] for genre in data.get("genres", [])]
 
                 # Get latest season/episode info
                 latest_season = max(
@@ -131,6 +235,9 @@ class TMDBService:
                     if latest_episode
                     else None,
                     "episode_title": latest_episode["name"] if latest_episode else None,
+                    "genres": genres,
+                    "cast": cast,
+                    "crew": crew,
                 }
 
     async def get_tv_episodes(

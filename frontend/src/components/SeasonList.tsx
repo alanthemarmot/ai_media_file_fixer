@@ -1,6 +1,7 @@
 import '../components/IconLink.css';
 import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
+import type { CastMember, CrewInfo } from '../api';
 
 interface TVSeason {
   season_number: number;
@@ -16,8 +17,12 @@ interface SeasonListProps {
   seriesTitle?: string;
   seriesYear?: number;
   network?: string;
+  genres?: string[];
+  cast?: CastMember[];
+  crew?: CrewInfo;
   onQualityChange?: (quality: '720p' | '1080p' | '2160p') => void;
   quality?: '720p' | '1080p' | '2160p';
+  onPersonSelect?: (personId: number, personName: string) => void;
 }
 
 export default function SeasonList({ 
@@ -27,8 +32,12 @@ export default function SeasonList({
   seriesTitle = '', 
   seriesYear,
   network = '',
+  genres,
+  cast,
+  crew,
   onQualityChange,
-  quality = '1080p'
+  quality = '1080p',
+  onPersonSelect
 }: SeasonListProps) {
   const [copied, setCopied] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality);
@@ -61,8 +70,6 @@ export default function SeasonList({
   };
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold mb-2">Select a Season</h3>
-      
       {/* Media Details section - similar to movie display */}
       {seriesTitle && (
         <div className="mb-6">
@@ -81,6 +88,60 @@ export default function SeasonList({
                 <p>
                   <span className="font-medium">Network:</span> {network}
                 </p>
+              )}
+              {genres && genres.length > 0 && (
+                <p>
+                  <span className="font-medium">Genres:</span> {genres.join(', ')}
+                </p>
+              )}
+              {cast && cast.length > 0 && (
+                <div>
+                  <span className="font-medium">Cast:</span>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {cast.map((actor) => (
+                      <button
+                        key={actor.id}
+                        onClick={() => onPersonSelect?.(actor.id, actor.name)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        title={actor.character ? `as ${actor.character}` : undefined}
+                      >
+                        {actor.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(crew?.directors || crew?.composers) && (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {crew?.directors && (
+                    <>
+                      <span className="font-medium">Director{(crew.directors.length > 1) ? 's' : ''}:</span>
+                      {crew.directors.map((director) => (
+                        <button
+                          key={`director-${director.id}`}
+                          onClick={() => onPersonSelect?.(director.id, director.name)}
+                          className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        >
+                          {director.name}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                  {crew?.composers && (
+                    <>
+                      <span className="font-medium">Composer{(crew.composers.length > 1) ? 's' : ''}:</span>
+                      {crew.composers.map((composer) => (
+                        <button
+                          key={`composer-${composer.id}`}
+                          onClick={() => onPersonSelect?.(composer.id, composer.name)}
+                          className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        >
+                          {composer.name}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -145,6 +206,7 @@ export default function SeasonList({
         </div>
       )}
         
+        <h3 className="text-lg font-semibold mb-2">Select a Season</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {seasons.map((season) => (
             <button

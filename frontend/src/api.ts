@@ -29,9 +29,30 @@ export interface SearchResult {
   popularity?: number;
 }
 
+export interface CastMember {
+  id: number;
+  name: string;
+  character?: string;
+  profile_path?: string;
+}
+
+export interface CrewMember {
+  id: number;
+  name: string;
+  profile_path?: string;
+}
+
+export interface CrewInfo {
+  directors?: CrewMember[];
+  composers?: CrewMember[];
+}
+
 export interface MovieDetails {
   title: string;
   year: number;
+  genres: string[];
+  cast: CastMember[];
+  crew: CrewInfo;
 }
 
 export interface TVShowDetails {
@@ -40,6 +61,9 @@ export interface TVShowDetails {
   season: number;
   episode: number;
   episode_title: string;
+  genres: string[];
+  cast: CastMember[];
+  crew: CrewInfo;
 }
 
 export interface TVSeason {

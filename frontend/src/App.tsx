@@ -106,10 +106,13 @@ function App() {
         try {
           const details = await getMediaDetails(item.id, 'tv');
           if ('network' in details) {
-            // Update the selectedItem with network info
+            // Update the selectedItem with network info and cast/crew details
             setSelectedItem({
               ...item,
-              network: details.network
+              network: details.network,
+              genres: details.genres,
+              cast: details.cast,
+              crew: details.crew
             });
           }
         } catch (networkError) {
@@ -302,8 +305,21 @@ function App() {
                             seriesTitle={selectedItem.title}
                             seriesYear={selectedItem.year}
                             network={selectedItem.network}
+                            genres={selectedItem.genres}
+                            cast={selectedItem.cast}
+                            crew={selectedItem.crew}
                             quality={quality}
                             onQualityChange={handleQualityChange}
+                            onPersonSelect={async (personId: number, personName: string) => {
+                              // Navigate to person's filmography
+                              const personItem = {
+                                id: personId,
+                                media_type: 'person' as const,
+                                title: '',
+                                name: personName
+                              };
+                              await handleSelect(personItem);
+                            }}
                           />
                         </div>
                       </div>
@@ -337,7 +353,19 @@ function App() {
                     {view === 'details' && selectedItem && (
                       <div className="flex flex-col min-h-[400px] h-full">
                         <div className="flex-1">
-                          <DisplayArea selectedItem={selectedItem} quality={quality} />
+                          <DisplayArea 
+                            selectedItem={selectedItem} 
+                            quality={quality} 
+                            onPersonSelect={async (personId: number, personName: string) => {
+                              // Navigate to person's filmography
+                              const personItem = {
+                                id: personId,
+                                media_type: 'person' as const,
+                                name: personName
+                              };
+                              await handleSelect(personItem);
+                            }}
+                          />
                         </div>
                       </div>
                     )}
