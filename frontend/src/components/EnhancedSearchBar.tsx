@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { searchMedia, type SearchResult } from '../api';
 import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { hasApiKey } from '../services/apiKeyService';
+import { hasApiKey, checkServerApiKey } from '../services/apiKeyService';
 import Fuse from 'fuse.js';
 
 interface EnhancedSearchBarProps {
@@ -53,7 +53,12 @@ export default function EnhancedSearchBar({
   }, [resetTrigger]);
 
   useEffect(() => {
-    setShowApiKeyWarning(!hasApiKey());
+    const checkApiKey = async () => {
+      const hasLocalKey = hasApiKey();
+      const hasServerKey = await checkServerApiKey();
+      setShowApiKeyWarning(!hasLocalKey && !hasServerKey);
+    };
+    checkApiKey();
   }, []);
 
   // Close suggestions when clicking outside

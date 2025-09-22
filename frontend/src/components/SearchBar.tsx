@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { searchMedia, type SearchResult } from '../api';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { hasApiKey } from '../services/apiKeyService';
+import { hasApiKey, checkServerApiKey } from '../services/apiKeyService';
 
 interface SearchBarProps {
   onSearch: (results: SearchResult[]) => void;
@@ -23,8 +23,12 @@ export default function SearchBar({ onSearch, resetTrigger = 0, onReset, hasResu
   }, [resetTrigger]);
   
   useEffect(() => {
-    // Check if API key is missing and show warning
-    setShowApiKeyWarning(!hasApiKey());
+    const checkApiKey = async () => {
+      const hasLocalKey = hasApiKey();
+      const hasServerKey = await checkServerApiKey();
+      setShowApiKeyWarning(!hasLocalKey && !hasServerKey);
+    };
+    checkApiKey();
   }, []);
   
   const handleReset = () => {

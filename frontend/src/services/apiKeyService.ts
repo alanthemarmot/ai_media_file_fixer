@@ -43,9 +43,9 @@ export const clearApiKey = (): void => {
  */
 export const checkServerApiKey = async (): Promise<boolean> => {
   try {
-    const response = await fetch('/api/server-key-status');
-    const data = await response.json();
-    return data.has_key === true;
+    // Import here to avoid circular dependency
+    const { checkServerApiKeyStatus } = await import('../api');
+    return await checkServerApiKeyStatus();
   } catch (error) {
     console.error('Error checking server API key:', error);
     return false;
