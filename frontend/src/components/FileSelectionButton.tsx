@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { DocumentIcon } from '@heroicons/react/24/outline';
+import { electronFileService } from '../services/electronFileService';
 
 interface FileSelectionButtonProps {
   onFileSelected: (file: File, filePath?: string) => void;
@@ -15,9 +16,34 @@ export default function FileSelectionButton({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleClick = () => {
-    if (!disabled && fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleClick = async () => {
+    if (disabled) return;
+
+    // Use Electron file dialog if available
+    if (electronFileService.isAvailable()) {
+      try {
+        const filePath = await electronFileService.showOpenDialog();
+        if (filePath) {
+          // Create a mock File object with the selected path
+          // In Electron, we'll work with the file path directly
+          const fileName = filePath.split('/').pop() || 'unknown';
+          const mockFile = new File([''], fileName);
+          // Add the real path as a property for our use
+          (mockFile as any).realPath = filePath;
+          onFileSelected(mockFile, filePath);
+        }
+      } catch (error) {
+        console.error('Error opening file dialog:', error);
+        // Fall back to browser file input
+        if (fileInputRef.current) {
+          fileInputRef.current.click();
+        }
+      }
+    } else {
+      // Use browser file input
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
     }
   };
 

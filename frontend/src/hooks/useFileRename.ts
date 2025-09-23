@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { renameFile as apiRenameFile } from '../api';
+import { electronFileService } from '../services/electronFileService';
 
 export interface SelectedFileInfo {
   file: File;
@@ -85,25 +86,33 @@ export function useFileRename() {
     try {
       for (const file of selectedFiles) {
         try {
-          // Use the detected path if available, otherwise simulate
+          // Check if we have a detected path to work with
           if (!file.detectedPath) {
-            console.log(`Would rename file from "${file.originalName}" to "${file.fullSuggestedName}"`);
-            // Simulate operation for demo purposes
-            await new Promise(resolve => setTimeout(resolve, 200));
+            console.log(`No file path detected for "${file.originalName}" - skipping`);
+            results.failed++;
+            results.errors.push(`${file.originalName}: No file path detected`);
+            continue;
+          }
+
+          console.log(`Renaming file: ${file.detectedPath} -> ${file.fullSuggestedName}`);
+
+          // Try Electron API first, fall back to HTTP API
+          let result;
+          if (electronFileService.isAvailable()) {
+            console.log('Using Electron file service');
+            result = await electronFileService.renameFile(file.detectedPath, file.fullSuggestedName);
+          } else {
+            console.log('Using HTTP API');
+            result = await apiRenameFile(file.detectedPath, file.fullSuggestedName);
+          }
+
+          if (result.success) {
+            console.log('File renamed successfully:', result.message);
             results.success++;
           } else {
-            // Call the actual API to rename the file
-            console.log(`Renaming file: ${file.detectedPath} -> ${file.fullSuggestedName}`);
-            const result = await apiRenameFile(file.detectedPath, file.fullSuggestedName);
-
-            if (result.success) {
-              console.log('File renamed successfully:', result.message);
-              results.success++;
-            } else {
-              console.error('File rename failed:', result.message);
-              results.failed++;
-              results.errors.push(`${file.originalName}: ${result.message}`);
-            }
+            console.error('File rename failed:', result.message);
+            results.failed++;
+            results.errors.push(`${file.originalName}: ${result.message}`);
           }
         } catch (error) {
           console.error('Error renaming file:', error);
