@@ -6,6 +6,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   renameFile: (originalPath, newName) =>
     ipcRenderer.invoke('rename-file', originalPath, newName),
 
+  renamePath: (originalPath, newName) =>
+    ipcRenderer.invoke('rename-path', originalPath, newName),
+
   validateFilename: (filename) =>
     ipcRenderer.invoke('validate-filename', filename),
 

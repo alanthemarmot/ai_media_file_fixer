@@ -25,11 +25,11 @@ export function useFileRename() {
     detectedPath?: string
   ) => {
     // Extract the file extension from the original file
-    const lastDotIndex = file.name.lastIndexOf('.');
-    const originalExtension = lastDotIndex !== -1 ? file.name.substring(lastDotIndex) : '';
+  const lastDotIndex = file.name.lastIndexOf('.');
+  const originalExtension = context === 'directory' ? '' : (lastDotIndex !== -1 ? file.name.substring(lastDotIndex) : '');
 
     // Create the full suggested name with the original extension
-    const fullSuggestedName = suggestedBaseName + originalExtension;
+  const fullSuggestedName = suggestedBaseName + originalExtension;
 
     const newFileInfo: SelectedFileInfo = {
       file,
@@ -94,15 +94,20 @@ export function useFileRename() {
             continue;
           }
 
-          console.log(`Renaming file: ${file.detectedPath} -> ${file.fullSuggestedName}`);
+          console.log(`Renaming ${file.context === 'directory' ? 'folder' : 'file'}: ${file.detectedPath} -> ${file.fullSuggestedName}`);
 
           // Try Electron API first, fall back to HTTP API
           let result;
           if (electronFileService.isAvailable()) {
             console.log('Using Electron file service');
-            result = await electronFileService.renameFile(file.detectedPath, file.fullSuggestedName);
+            if (file.context === 'directory') {
+              result = await electronFileService.renamePath(file.detectedPath, file.fullSuggestedName);
+            } else {
+              result = await electronFileService.renameFile(file.detectedPath, file.fullSuggestedName);
+            }
           } else {
             console.log('Using HTTP API');
+            // HTTP API likely only supports files; attempt anyway
             result = await apiRenameFile(file.detectedPath, file.fullSuggestedName);
           }
 

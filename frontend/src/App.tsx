@@ -15,6 +15,7 @@ import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
 import './components/IconLink.css'
+import mfrIcon from '../images/mfr_icon.png'
 import { getTVSeasons, getTVEpisodes, getMediaDetails, checkServerApiKeyStatus, getPersonFilmography, type FilmographyItem, type PersonFilmography } from './api';
 import { hasApiKey } from './services/apiKeyService';
 
@@ -282,7 +283,7 @@ function App() {
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
                       <img 
-                        src="/mfr_icon.png" 
+                        src={mfrIcon} 
                         alt="Media File Renamer" 
                         className="h-10 w-10 mr-3 cursor-pointer icon-link" 
                         onClick={resetSearch}

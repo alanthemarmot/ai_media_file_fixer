@@ -6,12 +6,16 @@ interface FileSelectionButtonProps {
   onFileSelected: (file: File, filePath?: string) => void;
   disabled?: boolean;
   className?: string;
+  buttonText?: string;
+  mode?: 'file' | 'directory';
 }
 
 export default function FileSelectionButton({
   onFileSelected,
   disabled = false,
-  className = "flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-1 rounded transition-colors"
+  className = "flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-1 rounded transition-colors",
+  buttonText = "Select File",
+  mode = 'file'
 }: FileSelectionButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -22,10 +26,9 @@ export default function FileSelectionButton({
     // Use Electron file dialog if available
     if (electronFileService.isAvailable()) {
       try {
-        const filePath = await electronFileService.showOpenDialog();
+        const filePath = await electronFileService.showOpenDialog(mode);
         if (filePath) {
-          // Create a mock File object with the selected path
-          // In Electron, we'll work with the file path directly
+          // Create a mock File object with the selected path or folder
           const fileName = filePath.split('/').pop() || 'unknown';
           const mockFile = new File([''], fileName);
           // Add the real path as a property for our use
@@ -104,7 +107,7 @@ export default function FileSelectionButton({
         title="Click to select file or drag & drop file here"
       >
         <DocumentIcon className="w-4 h-4" />
-        <span>Select File</span>
+        <span>{buttonText}</span>
       </button>
       <input
         ref={fileInputRef}

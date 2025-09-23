@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { saveApiKey } from '../services/apiKeyService';
 import { validateApiKey } from '../api';
+import mfrIcon from '../../images/mfr_icon.png';
 
 interface ApiKeySetupProps {
   onComplete: () => void;
@@ -50,7 +51,7 @@ export default function ApiKeySetup({ onComplete, onSkip }: ApiKeySetupProps) {
     <div className="py-8 px-4 max-w-3xl mx-auto">
       <div className="flex items-center justify-center mb-6">
         <img 
-          src="/mfr_icon.png" 
+          src={mfrIcon}
           alt="Media File Renamer" 
           className="h-10 w-10 mr-3" 
         />

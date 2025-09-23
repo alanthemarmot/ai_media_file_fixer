@@ -40,32 +40,34 @@ async function createWindow() {
     titleBarStyle: 'default'
   });
 
-  // Load the app
-  if (isDev) {
-    // Try different ports for dev server
-    const devPorts = [5173, 5174, 5175];
-    let loaded = false;
+  // Load the app: prefer Vite dev server if available, otherwise fall back to built files
+  const devPorts = [5173, 5174, 5175];
+  let loadedFromDevServer = false;
 
-    for (const port of devPorts) {
-      try {
-        await mainWindow.loadURL(`http://localhost:${port}`);
-        console.log(`Loaded dev server on port ${port}`);
-        loaded = true;
-        break;
-      } catch (error) {
-        console.log(`Port ${port} not available, trying next...`);
-      }
+  for (const port of devPorts) {
+    try {
+      await mainWindow.loadURL(`http://localhost:${port}`);
+      console.log(`Loaded dev server on port ${port}`);
+      loadedFromDevServer = true;
+      break;
+    } catch (error) {
+      console.log(`Port ${port} not available, trying next...`);
     }
+  }
 
-    if (!loaded) {
-      console.error('Could not connect to dev server on any port');
-      mainWindow.loadFile(path.join(__dirname, 'dist/index.html'));
+  if (!loadedFromDevServer) {
+    const distIndexPath = path.join(__dirname, 'dist/index.html');
+    if (fs.existsSync(distIndexPath)) {
+      await mainWindow.loadFile(distIndexPath);
+      console.log('Loaded built app from dist/index.html');
+    } else {
+      console.error('Neither dev server nor built files are available. Build the frontend (npm run build) or start Vite (npm run dev).');
     }
+  }
 
-    // Open DevTools in development
+  // Open DevTools when developing or when using the dev server
+  if (isDev || loadedFromDevServer) {
     mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'));
   }
 
   // Show window when ready to prevent visual flash
@@ -125,7 +127,7 @@ ipcMain.handle('rename-file', async (_, originalPath, newName) => {
       };
     }
 
-    // Check if it's actually a file (not a directory)
+    // Check if it exists and is a file
     const stats = fs.statSync(originalPath);
     if (!stats.isFile()) {
       return {
@@ -196,6 +198,89 @@ ipcMain.handle('rename-file', async (_, originalPath, newName) => {
       };
     }
 
+    return {
+      success: false,
+      message: `Unexpected error occurred: ${error.message}`,
+      error: 'UNKNOWN_ERROR'
+    };
+  }
+});
+
+// Generic rename that supports files AND directories
+ipcMain.handle('rename-path', async (_, originalPath, newName) => {
+  try {
+    if (!originalPath || !newName) {
+      return {
+        success: false,
+        message: 'Original path and new name are required',
+        error: 'INVALID_INPUT'
+      };
+    }
+
+    if (!fs.existsSync(originalPath)) {
+      return {
+        success: false,
+        message: `Path not found: ${originalPath}`,
+        error: 'PATH_NOT_FOUND'
+      };
+    }
+
+    // Build new path in same parent directory
+    const original = path.parse(originalPath);
+    const newPath = path.join(original.dir, newName);
+
+    if (fs.existsSync(newPath)) {
+      return {
+        success: false,
+        message: `A file or folder named '${newName}' already exists in the same directory`,
+        error: 'TARGET_EXISTS'
+      };
+    }
+
+    // Validate characters
+    const invalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+    if (process.platform === 'win32') {
+      invalidChars.push('/', '\\');
+    } else {
+      invalidChars.push('\0');
+    }
+    for (const char of invalidChars) {
+      if (newName.includes(char)) {
+        return {
+          success: false,
+          message: `Name contains invalid character: '${char}'`,
+          error: 'INVALID_NAME'
+        };
+      }
+    }
+
+    // Common length check
+    if (Buffer.byteLength(newName, 'utf8') > 255) {
+      return {
+        success: false,
+        message: 'Name is too long (maximum 255 bytes)',
+        error: 'NAME_TOO_LONG'
+      };
+    }
+
+    // Perform rename for file or directory
+    fs.renameSync(originalPath, newPath);
+
+    return {
+      success: true,
+      message: `Successfully renamed to '${newName}'`,
+      newPath,
+      originalPath
+    };
+  } catch (error) {
+    console.error('Error renaming path:', error);
+    if (error.code === 'EACCES' || error.code === 'EPERM') {
+      return {
+        success: false,
+        message: 'Permission denied. Unable to rename. Check permissions.',
+        error: 'PERMISSION_DENIED'
+      };
+    }
     return {
       success: false,
       message: `Unexpected error occurred: ${error.message}`,

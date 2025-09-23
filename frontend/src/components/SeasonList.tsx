@@ -43,6 +43,7 @@ export default function SeasonList({
   onFileSelected
 }: SeasonListProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedSeason, setCopiedSeason] = useState<number | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality);
   
   useEffect(() => {
@@ -74,6 +75,26 @@ export default function SeasonList({
 
   const handleFileSelectedForDirectory = (file: File, filePath: string | undefined) => {
     onFileSelected?.(file, filePath, directoryName);
+  };
+
+  const getSeasonDirectoryName = (season: TVSeason) => {
+    return `Season ${season.season_number} (${selectedQuality})`;
+  };
+
+  const copySeasonToClipboard = async (season: TVSeason) => {
+    try {
+      const seasonDirectoryName = getSeasonDirectoryName(season);
+      await navigator.clipboard.writeText(seasonDirectoryName);
+      setCopiedSeason(season.season_number);
+      setTimeout(() => setCopiedSeason(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleSeasonFileSelected = (season: TVSeason, file: File, filePath: string | undefined) => {
+    const seasonDirectoryName = getSeasonDirectoryName(season);
+    onFileSelected?.(file, filePath, seasonDirectoryName);
   };
   return (
     <div className="space-y-4">
@@ -197,8 +218,10 @@ export default function SeasonList({
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated directory name:</h3>
             <div className="flex items-center space-x-2">
               <FileSelectionButton
+                mode="directory"
                 onFileSelected={(file, filePath) => handleFileSelectedForDirectory(file, filePath)}
                 className="flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors"
+                buttonText="Select Folder"
               />
               <button
                 onClick={copyToClipboard}
@@ -220,27 +243,54 @@ export default function SeasonList({
       )}
         
         <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Select a Season</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {seasons.map((season) => (
-            <button
-              key={season.season_number}
-              onClick={() => onSelect(season)}
-              className={`flex flex-col items-center p-2 border rounded-lg shadow bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${selectedSeason === season.season_number ? 'border-blue-500 ring-2 ring-blue-400' : 'border-gray-200 dark:border-gray-600'}`}
-            >
-              {season.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w154${season.poster_path}`}
-                  alt={season.name}
-                  className="w-20 h-28 object-cover rounded mb-2 shadow bg-white"
+            <div key={season.season_number} className="space-y-2">
+              <button
+                onClick={() => onSelect(season)}
+                className={`flex flex-col items-center p-2 border rounded-lg shadow bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full ${selectedSeason === season.season_number ? 'border-blue-500 ring-2 ring-blue-400' : 'border-gray-200 dark:border-gray-600'}`}
+              >
+                {season.poster_path ? (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w154${season.poster_path}`}
+                    alt={season.name}
+                    className="w-20 h-28 object-cover rounded mb-2 shadow bg-white"
+                  />
+                ) : (
+                  <div className="w-20 h-28 bg-gray-200 dark:bg-gray-600 rounded mb-2 flex items-center justify-center text-gray-400 dark:text-gray-300 text-xs">No Image</div>
+                )}
+                <span className="font-medium text-sm text-center text-gray-900 dark:text-gray-100">{season.name}</span>
+                {season.episode_count !== undefined && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{season.episode_count} episodes</span>
+                )}
+              </button>
+
+              {/* Season directory name text box */}
+              <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-xs text-gray-900 dark:text-gray-100 text-center">
+                {getSeasonDirectoryName(season)}
+              </div>
+
+              {/* Select Folder and Copy buttons */}
+              <div className="flex space-x-1">
+                <FileSelectionButton
+                  mode="directory"
+                  onFileSelected={(file, filePath) => handleSeasonFileSelected(season, file, filePath)}
+                  className="flex-1 flex items-center justify-center space-x-1 text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded transition-colors"
+                  buttonText="Select Folder"
                 />
-              ) : (
-                <div className="w-20 h-28 bg-gray-200 dark:bg-gray-600 rounded mb-2 flex items-center justify-center text-gray-400 dark:text-gray-300 text-xs">No Image</div>
-              )}
-              <span className="font-medium text-sm text-center text-gray-900 dark:text-gray-100">{season.name}</span>
-              {season.episode_count !== undefined && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">{season.episode_count} episodes</span>
-              )}
-            </button>
+                <button
+                  onClick={() => copySeasonToClipboard(season)}
+                  className="flex-1 flex items-center justify-center space-x-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded transition-colors"
+                >
+                  {copiedSeason === season.season_number ? (
+                    <CheckIcon className="w-3 h-3 text-white" />
+                  ) : (
+                    <ClipboardIcon className="w-3 h-3" />
+                  )}
+                  <span>{copiedSeason === season.season_number ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
+            </div>
           ))}
         </div>
 
