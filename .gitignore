@@ -7,6 +7,37 @@ backend/.env
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Node.js dependencies
 node_modules/
+
+# Build outputs
+frontend/dist/
+frontend/dist-electron/
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
