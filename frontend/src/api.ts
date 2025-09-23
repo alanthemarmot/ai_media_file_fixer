@@ -212,3 +212,29 @@ export const getPersonFilmography = async (personId: number): Promise<PersonFilm
     throw error;
   }
 };
+
+export interface RenameFileRequest {
+  originalPath: string;
+  newName: string;
+}
+
+export interface RenameFileResponse {
+  success: boolean;
+  message: string;
+  newPath?: string;
+}
+
+export const renameFile = async (originalPath: string, newName: string): Promise<RenameFileResponse> => {
+  try {
+    const response = await api.post('/files/rename', {
+      originalPath,
+      newName
+    } as RenameFileRequest);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.detail || 'An error occurred while renaming the file.');
+    }
+    throw error;
+  }
+};

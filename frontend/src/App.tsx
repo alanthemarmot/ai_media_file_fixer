@@ -9,6 +9,8 @@ import Breadcrumb from './components/Breadcrumb';
 import ApiKeySetup from './components/ApiKeySetup';
 import SettingsModal from './components/SettingsModal';
 import ThemeToggle from './components/ThemeToggle';
+import BulkRenamePanel from './components/BulkRenamePanel';
+import { useFileRename } from './hooks/useFileRename';
 import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
@@ -32,6 +34,9 @@ function App() {
   const [loadingFilmography, setLoadingFilmography] = useState(false);
   const [personContext, setPersonContext] = useState<any | null>(null); // Track person when viewing items from their filmography
   const mainContentRef = useRef<HTMLDivElement>(null);
+
+  // Bulk file rename functionality
+  const { selectedFiles, isRenaming, addFile, removeFile, clearAllFiles, updateFileName, renameAllFiles } = useFileRename();
   
   // Check if API key exists on component mount
   useEffect(() => {
@@ -243,6 +248,20 @@ function App() {
     return items;
   };
 
+  // File selection handlers for bulk rename
+  const handleEpisodeFileSelected = (file: File, filePath: string | undefined, episode: any) => {
+    const suggestedName = `S${String(selectedSeason?.season_number || 1).padStart(2, '0')}E${String(episode.episode_number).padStart(2, '0')} - ${episode.name} (${quality})`;
+    addFile(file, suggestedName, 'episode', episode, filePath);
+  };
+
+  const handleMovieFileSelected = (file: File, filePath: string | undefined, fileName: string) => {
+    addFile(file, fileName.replace(/\.[^/.]+$/, ""), 'movie', { details: selectedItem }, filePath);
+  };
+
+  const handleDirectoryFileSelected = (file: File, filePath: string | undefined, directoryName: string) => {
+    addFile(file, directoryName.replace(/\.[^/.]+$/, ""), 'directory', { seriesTitle: selectedItem?.title, network: selectedItem?.network }, filePath);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 flex flex-col justify-center">
       {apiKeyStatus === 'missing' ? (
@@ -324,6 +343,7 @@ function App() {
                               };
                               await handleSelect(personItem);
                             }}
+                            onFileSelected={handleDirectoryFileSelected}
                           />
                         </div>
                       </div>
@@ -344,6 +364,7 @@ function App() {
                               moviePosterPath={selectedItem.poster_path}
                               network={selectedItem.network}
                               onQualityChange={handleQualityChange}
+                              onFileSelected={handleEpisodeFileSelected}
                             />
                           ) : (
                             <div className="text-center text-gray-500 py-4">No episodes found</div>
@@ -357,9 +378,9 @@ function App() {
                     {view === 'details' && selectedItem && (
                       <div className="flex flex-col min-h-[400px] h-full">
                         <div className="flex-1">
-                          <DisplayArea 
-                            selectedItem={selectedItem} 
-                            quality={quality} 
+                          <DisplayArea
+                            selectedItem={selectedItem}
+                            quality={quality}
                             onPersonSelect={async (personId: number, personName: string) => {
                               // Navigate to person's filmography
                               const personItem = {
@@ -369,6 +390,7 @@ function App() {
                               };
                               await handleSelect(personItem);
                             }}
+                            onFileSelected={handleMovieFileSelected}
                           />
                         </div>
                       </div>
@@ -408,6 +430,16 @@ function App() {
           />
         </div>
       )}
+
+      {/* Bulk Rename Panel - Fixed at bottom */}
+      <BulkRenamePanel
+        files={selectedFiles}
+        isRenaming={isRenaming}
+        onRenameAll={renameAllFiles}
+        onRemoveFile={removeFile}
+        onClearAll={clearAllFiles}
+        onUpdateFileName={updateFileName}
+      />
     </div>
   )
 }

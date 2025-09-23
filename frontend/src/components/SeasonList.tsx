@@ -2,6 +2,7 @@ import '../components/IconLink.css';
 import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
 import type { CastMember, CrewInfo } from '../api';
+import FileSelectionButton from './FileSelectionButton';
 
 interface TVSeason {
   season_number: number;
@@ -23,13 +24,14 @@ interface SeasonListProps {
   onQualityChange?: (quality: '720p' | '1080p' | '2160p') => void;
   quality?: '720p' | '1080p' | '2160p';
   onPersonSelect?: (personId: number, personName: string) => void;
+  onFileSelected?: (file: File, filePath: string | undefined, directoryName: string) => void;
 }
 
-export default function SeasonList({ 
-  seasons, 
-  onSelect, 
-  selectedSeason, 
-  seriesTitle = '', 
+export default function SeasonList({
+  seasons,
+  onSelect,
+  selectedSeason,
+  seriesTitle = '',
   seriesYear,
   network = '',
   genres,
@@ -37,7 +39,8 @@ export default function SeasonList({
   crew,
   onQualityChange,
   quality = '1080p',
-  onPersonSelect
+  onPersonSelect,
+  onFileSelected
 }: SeasonListProps) {
   const [copied, setCopied] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality);
@@ -67,6 +70,10 @@ export default function SeasonList({
     if (onQualityChange) {
       onQualityChange(newQuality);
     }
+  };
+
+  const handleFileSelectedForDirectory = (file: File, filePath: string | undefined) => {
+    onFileSelected?.(file, filePath, directoryName);
   };
   return (
     <div className="space-y-4">
@@ -188,17 +195,23 @@ export default function SeasonList({
           
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated directory name:</h3>
-            <button
-              onClick={copyToClipboard}
-              className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
-            >
-              {copied ? (
-                <CheckIcon className="w-5 h-5 text-white" />
-              ) : (
-                <ClipboardIcon className="w-5 h-5" />
-              )}
-              <span>{copied ? 'Copied!' : 'Copy'}</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <FileSelectionButton
+                onFileSelected={(file, filePath) => handleFileSelectedForDirectory(file, filePath)}
+                className="flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors"
+              />
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
+              >
+                {copied ? (
+                  <CheckIcon className="w-5 h-5 text-white" />
+                ) : (
+                  <ClipboardIcon className="w-5 h-5" />
+                )}
+                <span>{copied ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
           </div>
           <div className="p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm text-gray-900 dark:text-gray-100">
             {directoryName}
@@ -230,6 +243,7 @@ export default function SeasonList({
             </button>
           ))}
         </div>
+
       </div>
     );
   }

@@ -1,5 +1,12 @@
 from fastapi import APIRouter, HTTPException, Header
 from app.services.tmdb import TMDBService
+from app.services.file_service import FileService
+from app.models.file_models import (
+    RenameFileRequest,
+    RenameFileResponse,
+    ValidateFilenameRequest,
+    ValidateFilenameResponse
+)
 from app.core.config import get_settings, has_server_api_key
 from typing import Optional
 
@@ -153,3 +160,50 @@ async def get_person_filmography(
         return filmography
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/files/rename", response_model=RenameFileResponse)
+async def rename_file(request: RenameFileRequest):
+    """Rename a file on the file system"""
+    try:
+        # First validate the new filename
+        validation_result = FileService.validate_filename(request.new_name)
+        if not validation_result["valid"]:
+            return RenameFileResponse(
+                success=False,
+                message=f"Invalid filename: {validation_result['message']}",
+                error="INVALID_FILENAME"
+            )
+
+        # Attempt to rename the file
+        result = FileService.rename_file(request.original_path, request.new_name)
+
+        return RenameFileResponse(
+            success=result["success"],
+            message=result["message"],
+            new_path=result.get("new_path"),
+            original_path=result.get("original_path"),
+            error=result.get("error")
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error during file rename: {str(e)}"
+        )
+
+
+@router.post("/files/validate-filename", response_model=ValidateFilenameResponse)
+async def validate_filename(request: ValidateFilenameRequest):
+    """Validate a filename for the current operating system"""
+    try:
+        result = FileService.validate_filename(request.filename)
+        return ValidateFilenameResponse(
+            valid=result["valid"],
+            message=result["message"]
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error validating filename: {str(e)}"
+        )

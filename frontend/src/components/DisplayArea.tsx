@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { type SearchResult, type MediaDetails, getMediaDetails } from '../api';
+import FileSelectionButton from './FileSelectionButton';
 
 interface DisplayAreaProps {
   selectedItem: SearchResult | null;
   quality?: string;
   onPersonSelect?: (personId: number, personName: string) => void;
+  onFileSelected?: (file: File, filePath: string | undefined, fileName: string) => void;
 }
 
-export default function DisplayArea({ selectedItem, quality = '1080p', onPersonSelect }: DisplayAreaProps) {
+export default function DisplayArea({ selectedItem, quality = '1080p', onPersonSelect, onFileSelected }: DisplayAreaProps) {
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +78,10 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
     } catch (err) {
       console.error('Failed to copy:', err);
     }
+  };
+
+  const handleFileSelectedForMovie = (file: File, filePath: string | undefined) => {
+    onFileSelected?.(file, filePath, fileName);
   };
 
   if (!selectedItem) {
@@ -313,17 +319,23 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
       </div>
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated filename:</h3>
-        <button
-          onClick={copyToClipboard}
-          className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
-        >
-          {copied ? (
-            <CheckIcon className="w-5 h-5 text-white" />
-          ) : (
-            <ClipboardIcon className="w-5 h-5" />
-          )}
-          <span>{copied ? 'Copied!' : 'Copy'}</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <FileSelectionButton
+            onFileSelected={(file, filePath) => handleFileSelectedForMovie(file, filePath)}
+            className="flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors"
+          />
+          <button
+            onClick={copyToClipboard}
+            className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
+          >
+            {copied ? (
+              <CheckIcon className="w-5 h-5 text-white" />
+            ) : (
+              <ClipboardIcon className="w-5 h-5" />
+            )}
+            <span>{copied ? 'Copied!' : 'Copy'}</span>
+          </button>
+        </div>
       </div>
       <div className="mt-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm text-gray-900 dark:text-gray-100">
         {fileName}

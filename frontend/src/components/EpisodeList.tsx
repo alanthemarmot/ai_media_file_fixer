@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
 import type { TVEpisode } from '../api';
 import '../components/IconLink.css';
+import FileSelectionButton from './FileSelectionButton';
 
 const DEFAULT_QUALITY = '1080p';
 
@@ -17,18 +18,20 @@ interface EpisodeListProps {
   moviePosterPath?: string;
   network?: string;
   onQualityChange?: (quality: '720p' | '1080p' | '2160p') => void;
+  onFileSelected?: (file: File, filePath: string | undefined, episode: TVEpisode) => void;
 }
 
-export default function EpisodeList({ 
-  episodes, 
-  seriesTitle, 
+export default function EpisodeList({
+  episodes,
+  seriesTitle,
   seriesYear,
-  seasonNumber, 
+  seasonNumber,
   quality = DEFAULT_QUALITY as '1080p',
-  selectedSeason, 
-  moviePosterPath, 
+  selectedSeason,
+  moviePosterPath,
   network,
-  onQualityChange
+  onQualityChange,
+  onFileSelected
 }: EpisodeListProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<'720p' | '1080p' | '2160p'>(quality);
@@ -57,6 +60,10 @@ export default function EpisodeList({
     } catch (err) {
       // ignore
     }
+  };
+
+  const handleFileSelected = (file: File, filePath: string | undefined, ep: TVEpisode) => {
+    onFileSelected?.(file, filePath, ep);
   };
 
   return (
@@ -139,14 +146,20 @@ export default function EpisodeList({
                 {getFilename(ep)}
               </code>
             </div>
-            <button
-              onClick={() => handleCopy(ep, idx)}
-              className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-3 py-1 text-xs self-end sm:self-auto sm:ml-auto transition-colors"
-              style={{ minWidth: '70px' }}
-            >
-              {copiedIndex === idx ? <CheckIcon className="w-4 h-4 text-white mr-1" /> : <ClipboardIcon className="w-4 h-4 mr-1" />}
-              {copiedIndex === idx ? 'Copied!' : 'Copy'}
-            </button>
+            <div className="flex items-center space-x-2 self-end sm:self-auto sm:ml-auto">
+              <FileSelectionButton
+                onFileSelected={(file, filePath) => handleFileSelected(file, filePath, ep)}
+                className="flex items-center space-x-1 text-xs bg-green-500 hover:bg-green-600 text-white rounded px-3 py-1 transition-colors"
+              />
+              <button
+                onClick={() => handleCopy(ep, idx)}
+                className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded px-3 py-1 text-xs transition-colors"
+                style={{ minWidth: '70px' }}
+              >
+                {copiedIndex === idx ? <CheckIcon className="w-4 h-4 text-white mr-1" /> : <ClipboardIcon className="w-4 h-4 mr-1" />}
+                {copiedIndex === idx ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
           </div>
         ))}
       </div>
