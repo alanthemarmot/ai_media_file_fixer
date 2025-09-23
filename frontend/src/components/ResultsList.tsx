@@ -13,7 +13,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
 
   if (results.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         No results to display
       </div>
     );
@@ -29,7 +29,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
         <button
           key={`${result.media_type}-${result.id}`}
           onClick={() => onSelect(result)}
-          className="flex flex-col items-center p-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex flex-col items-center p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {result.poster_path ? (
             <img
@@ -38,12 +38,12 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
               className="w-32 h-48 object-cover rounded mb-2"
             />
           ) : (
-            <div className="w-32 h-48 bg-gray-200 rounded mb-2 flex items-center justify-center text-gray-400 text-xs">
+            <div className="w-32 h-48 bg-gray-200 dark:bg-gray-600 rounded mb-2 flex items-center justify-center text-gray-400 dark:text-gray-300 text-xs">
               No Image
             </div>
           )}
-          <span className="font-medium text-center text-lg">{result.title}</span>
-          <span className="text-sm text-gray-500">{result.year}</span>
+          <span className="font-medium text-center text-lg text-gray-900 dark:text-gray-100">{result.title}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{result.year}</span>
         </button>
       ))}
     </div>
@@ -58,7 +58,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
             className={`flex-1 py-3 px-4 font-medium text-md text-center ${
               activeTab === 'tv'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             } ${people.length > 0 ? 'rounded-tl-md' : 'rounded-l-md'}`}
           >
             TV Shows ({tvShows.length})
@@ -68,7 +68,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
             className={`flex-1 py-3 px-4 font-medium text-md text-center ${
               activeTab === 'movies'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             } ${people.length === 0 ? 'rounded-r-md' : ''}`}
           >
             Movies ({movies.length})
@@ -79,7 +79,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
               className={`flex-1 py-3 px-4 font-medium text-md text-center rounded-tr-md ${
                 activeTab === 'people'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               People ({people.length})

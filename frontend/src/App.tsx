@@ -8,6 +8,7 @@ import Filmography from './components/Filmography';
 import Breadcrumb from './components/Breadcrumb';
 import ApiKeySetup from './components/ApiKeySetup';
 import SettingsModal from './components/SettingsModal';
+import ThemeToggle from './components/ThemeToggle';
 import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
@@ -243,7 +244,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 flex flex-col justify-center">
       {apiKeyStatus === 'missing' ? (
         <ApiKeySetup 
           onComplete={() => setApiKeyStatus('present')}
@@ -255,10 +256,10 @@ function App() {
         </div>
       ) : (
         <div className="relative py-3 max-w-7xl mx-auto w-full min-w-[800px]">
-          <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 overflow-x-hidden" ref={mainContentRef}>
+          <div className="relative px-4 py-10 bg-white dark:bg-gray-800 shadow-lg sm:rounded-3xl sm:p-20 overflow-x-hidden" ref={mainContentRef}>
             <div className="max-w-5xl mx-auto min-w-[700px]">
-              <div className="divide-y divide-gray-200">
-                <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="py-8 text-base leading-6 space-y-4 text-gray-700 dark:text-gray-300 sm:text-lg sm:leading-7">
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
                       <img 
@@ -269,13 +270,16 @@ function App() {
                       />
                       <h1 className="text-3xl font-bold">Media File Renamer</h1>
                     </div>
-                    <button 
-                      onClick={() => setIsSettingsOpen(true)}
-                      className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
-                      title="Settings"
-                    >
-                      <Cog6ToothIcon className="h-6 w-6 text-white" />
-                    </button>
+                    <div className="flex items-center space-x-3">
+                      <ThemeToggle />
+                      <button
+                        onClick={() => setIsSettingsOpen(true)}
+                        className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
+                        title="Settings"
+                      >
+                        <Cog6ToothIcon className="h-6 w-6 text-white" />
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Breadcrumb navigation - now shown on all pages */}

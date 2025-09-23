@@ -6,6 +6,19 @@ interface FilmographyProps {
   onItemSelect: (item: FilmographyItem) => void;
 }
 
+const calculateAge = (birthday: string): number => {
+  const birthDate = new Date(birthday);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+};
+
 export default function Filmography({ filmography, onItemSelect }: FilmographyProps) {
   const [activeTab, setActiveTab] = useState<string>('primary');
 
@@ -68,7 +81,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
   const renderFilmographyGrid = (items: FilmographyItem[]) => {
     if (items.length === 0) {
       return (
-        <div className="text-center text-gray-500 py-8">
+        <div className="text-center text-gray-500 dark:text-gray-400 py-8">
           No items in this category
         </div>
       );
@@ -80,7 +93,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
           <button
             key={`${item.media_type}-${item.id}-${index}`}
             onClick={() => onItemSelect(item)}
-            className="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            className="flex flex-col items-center p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
           >
             {item.poster_path ? (
               <img
@@ -89,19 +102,19 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
                 className="w-24 h-36 object-cover rounded mb-2"
               />
             ) : (
-              <div className="w-24 h-36 bg-gray-200 rounded mb-2 flex items-center justify-center text-gray-400 text-xs">
+              <div className="w-24 h-36 bg-gray-200 dark:bg-gray-600 rounded mb-2 flex items-center justify-center text-gray-400 dark:text-gray-300 text-xs">
                 No Image
               </div>
             )}
-            <span className="font-medium text-center text-sm line-clamp-2">{item.title}</span>
-            {item.year && <span className="text-xs text-gray-500">{item.year}</span>}
+            <span className="font-medium text-center text-sm line-clamp-2 text-gray-900 dark:text-gray-100">{item.title}</span>
+            {item.year && <span className="text-xs text-gray-500 dark:text-gray-400">{item.year}</span>}
             {item.character && (
-              <span className="text-xs text-blue-600 text-center line-clamp-1">as {item.character}</span>
+              <span className="text-xs text-blue-600 dark:text-blue-400 text-center line-clamp-1">as {item.character}</span>
             )}
             {item.job && (
-              <span className="text-xs text-green-600 text-center line-clamp-1">{item.job}</span>
+              <span className="text-xs text-green-600 dark:text-green-400 text-center line-clamp-1">{item.job}</span>
             )}
-            <span className="text-xs text-gray-400 uppercase mt-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1">
               {item.media_type}
             </span>
           </button>
@@ -119,7 +132,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Person Info Header */}
-      <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-600">
         <div className="flex items-start space-x-6">
           {filmography.person.profile_path ? (
             <img
@@ -128,37 +141,37 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
               className="w-32 h-48 object-cover rounded-lg"
             />
           ) : (
-            <div className="w-32 h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+            <div className="w-32 h-48 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-300">
               No Photo
             </div>
           )}
           <div className="flex-1">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">{filmography.person.name}</h2>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">{filmography.person.name}</h2>
             {filmography.person.known_for_department && (
-              <p className="text-lg text-blue-600 mb-2">
+              <p className="text-lg text-blue-600 dark:text-blue-400 mb-2">
                 {filmography.person.known_for_department === 'Sound' ? 'Composer' : filmography.person.known_for_department}
               </p>
             )}
             {filmography.person.birthday && (
-              <p className="text-sm text-gray-600 mb-1">
-                <span className="font-medium">Born:</span> {filmography.person.birthday}
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                <span className="font-medium">Born:</span> {filmography.person.birthday} ({calculateAge(filmography.person.birthday)} years)
               </p>
             )}
             {filmography.person.place_of_birth && (
-              <p className="text-sm text-gray-600 mb-3">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                 <span className="font-medium">Place of Birth:</span> {filmography.person.place_of_birth}
               </p>
             )}
             {filmography.person.biography && (
-              <p className="text-sm text-gray-700 line-clamp-4">{filmography.person.biography}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-4">{filmography.person.biography}</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Filmography sections */}
-      <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Filmography</h2>
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-600">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">Filmography</h2>
         
         {/* Tab Navigation */}
         <div className="w-full mb-6">
@@ -170,7 +183,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
                 className={`flex-1 py-3 px-4 font-medium text-md text-center ${
                   activeTab === tab.key
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 } ${
                   index === 0 
                     ? 'rounded-l-md' 
@@ -197,7 +210,7 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
         </div>
 
         {filmography.cast.length === 0 && filmography.crew.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-gray-500 dark:text-gray-400 py-8">
             No filmography available
           </div>
         )}

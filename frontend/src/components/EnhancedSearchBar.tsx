@@ -278,7 +278,7 @@ export default function EnhancedSearchBar({
       )}
       
       {showApiKeyWarning && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mb-4">
           <div className="flex">
             <div className="ml-3">
               <p className="text-sm text-yellow-700">
@@ -305,25 +305,25 @@ export default function EnhancedSearchBar({
                 }
               }}
               placeholder="Search for movies, TV shows, or people..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               autoComplete="off"
             />
             
             {/* Search suggestions dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-64 overflow-y-auto z-50">
+              <div className="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg mt-1 max-h-64 overflow-y-auto z-50">
                 {suggestions.map((suggestion, index) => (
                   <button
                     key={`${suggestion.media_type}-${suggestion.id}`}
                     type="button"
                     onClick={() => handleSuggestionSelect(suggestion)}
-                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors ${
-                      index === selectedSuggestionIndex ? 'bg-blue-100' : ''
+                    className={`w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 focus:bg-blue-50 dark:focus:bg-gray-700 focus:outline-none transition-colors text-gray-900 dark:text-gray-100 ${
+                      index === selectedSuggestionIndex ? 'bg-blue-100 dark:bg-gray-700' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-2">
                       <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 truncate">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
                         {getSuggestionDisplayText(suggestion)}
                       </span>
                     </div>

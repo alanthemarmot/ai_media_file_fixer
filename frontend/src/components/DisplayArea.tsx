@@ -80,7 +80,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
 
   if (!selectedItem) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         Select an item to see details
       </div>
     );
@@ -88,7 +88,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
 
   if (isLoading) {
     return (
-      <div className="text-center text-gray-500 py-8">
+      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
         Loading details...
       </div>
     );
@@ -96,7 +96,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
 
   if (error) {
     return (
-      <div className="text-center text-red-500 py-8">
+      <div className="text-center text-red-500 dark:text-red-400 py-8">
         {error}
       </div>
     );
@@ -119,14 +119,14 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             />
           )}
           <div className="flex items-center">
-            <h2 className="text-2xl font-bold text-center">
+            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
               {details ? details.title : selectedItem.title} {!('episode_title' in details) && details.year ? `[${details.year}]` : ''}
             </h2>
           </div>
         </div>
       </div>
-      <h2 className="text-xl font-semibold mb-4">Media Details</h2>
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Media Details</h2>
+      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-gray-900 dark:text-gray-100">
         {'episode_title' in details ? (
           // TV Show details
           <div className="space-y-2">
@@ -153,7 +153,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                     <button
                       key={actor.id}
                       onClick={() => onPersonSelect?.(actor.id, actor.name)}
-                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       title={actor.character ? `as ${actor.character}` : undefined}
                     >
                       {actor.name}
@@ -171,7 +171,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                       <button
                         key={`director-${director.id}`}
                         onClick={() => onPersonSelect?.(director.id, director.name)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       >
                         {director.name}
                       </button>
@@ -185,7 +185,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                       <button
                         key={`composer-${composer.id}`}
                         onClick={() => onPersonSelect?.(composer.id, composer.name)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       >
                         {composer.name}
                       </button>
@@ -196,7 +196,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             )}
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
-              <code className="block bg-gray-100 p-2 rounded mt-1">
+              <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
                 {`${details.title} - S${details.season.toString().padStart(2, '0')}E${details.episode
                   .toString()
                   .padStart(2, '0')} - ${details.episode_title} (${selectedQuality})`}
@@ -225,7 +225,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                     <button
                       key={actor.id}
                       onClick={() => onPersonSelect?.(actor.id, actor.name)}
-                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       title={actor.character ? `as ${actor.character}` : undefined}
                     >
                       {actor.name}
@@ -243,7 +243,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                       <button
                         key={`director-${director.id}`}
                         onClick={() => onPersonSelect?.(director.id, director.name)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       >
                         {director.name}
                       </button>
@@ -257,7 +257,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                       <button
                         key={`composer-${composer.id}`}
                         onClick={() => onPersonSelect?.(composer.id, composer.name)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline text-sm bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline text-sm bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded transition-colors"
                       >
                         {composer.name}
                       </button>
@@ -268,7 +268,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             )}
             {/* Quality selector for movies */}
             <div className="mb-3">
-              <label className="text-sm font-medium text-gray-700 block mb-2">Select quality format:</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">Select quality format:</label>
               <div className="flex justify-center space-x-4">
                 <label className="inline-flex items-center">
                   <input
@@ -278,7 +278,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                     checked={selectedQuality === '720p'}
                     onChange={() => handleQualityChange('720p')}
                   />
-                  <span className="ml-2">720p</span>
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">720p</span>
                 </label>
                 <label className="inline-flex items-center">
                   <input
@@ -288,7 +288,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                     checked={selectedQuality === '1080p'}
                     onChange={() => handleQualityChange('1080p')}
                   />
-                  <span className="ml-2">1080p</span>
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">1080p</span>
                 </label>
                 <label className="inline-flex items-center">
                   <input
@@ -298,13 +298,13 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                     checked={selectedQuality === '2160p'}
                     onChange={() => handleQualityChange('2160p')}
                   />
-                  <span className="ml-2">2160p</span>
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">2160p</span>
                 </label>
               </div>
             </div>
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
-              <code className="block bg-gray-100 p-2 rounded mt-1">
+              <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
                 {`${details.title} [${details.year}](${selectedQuality})`}
               </code>
             </div>
@@ -312,7 +312,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
         )}
       </div>
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium text-gray-700">Generated filename:</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated filename:</h3>
         <button
           onClick={copyToClipboard}
           className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
@@ -325,7 +325,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
           <span>{copied ? 'Copied!' : 'Copy'}</span>
         </button>
       </div>
-      <div className="mt-2 p-3 bg-white rounded border border-gray-200 font-mono text-sm">
+      <div className="mt-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm text-gray-900 dark:text-gray-100">
         {fileName}
       </div>
     </div>
