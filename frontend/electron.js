@@ -9,7 +9,9 @@ async function createWindow() {
     path.join(__dirname, 'assets/icon.icns'),
     path.join(__dirname, 'assets/icon.png'),
     path.join(__dirname, 'public/mfr_icon.png'),
-    path.join(__dirname, 'dist/mfr_icon.png')
+    path.join(__dirname, 'dist/mfr_icon.png'),
+    // Fallback to repo images directory (useful in dev)
+    path.join(__dirname, 'images/mfr_icon.png')
   ];
 
   let iconPath = null;
@@ -24,8 +26,8 @@ async function createWindow() {
   }
 
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1500,
+    height:1200,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
