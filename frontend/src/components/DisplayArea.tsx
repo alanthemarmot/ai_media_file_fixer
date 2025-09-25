@@ -57,14 +57,21 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
     setSelectedQuality(q);
   };
 
+  // Helper function to sanitize titles for filenames
+  const sanitizeTitle = (title: string) => {
+    return title.replace(/:/g, ' -').replace(/[<>:"/\\|?*]/g, ' ').replace(/\s+/g, ' ').trim();
+  };
+
   const getFileName = () => {
     if (!details) return '';
     if ('episode' in details) {
       // TV Show
-      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${details.episode_title} (${selectedQuality})`;
+      const cleanEpisodeTitle = sanitizeTitle(details.episode_title || 'Unknown Episode');
+      return `S${String(details.season).padStart(2, '0')}E${String(details.episode).padStart(2, '0')} - ${cleanEpisodeTitle} (${selectedQuality})`;
     } else {
       // Movie
-      return `${details.title} [${details.year}](${selectedQuality})`;
+      const cleanTitle = sanitizeTitle(details.title || 'Unknown Movie');
+      return `${cleanTitle} [${details.year}](${selectedQuality})`;
     }
   };
 
@@ -203,9 +210,9 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
               <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
-                {`${details.title} - S${details.season.toString().padStart(2, '0')}E${details.episode
+                {`${sanitizeTitle(details.title)} - S${details.season.toString().padStart(2, '0')}E${details.episode
                   .toString()
-                  .padStart(2, '0')} - ${details.episode_title} (${selectedQuality})`}
+                  .padStart(2, '0')} - ${sanitizeTitle(details.episode_title || 'Unknown Episode')} (${selectedQuality})`}
               </code>
             </div>
           </div>
@@ -311,7 +318,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
               <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
-                {`${details.title} [${details.year}](${selectedQuality})`}
+                {`${sanitizeTitle(details.title || 'Unknown Movie')} [${details.year}](${selectedQuality})`}
               </code>
             </div>
           </div>

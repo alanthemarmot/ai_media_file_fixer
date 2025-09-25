@@ -249,9 +249,15 @@ function App() {
     return items;
   };
 
+  // Helper function to sanitize titles for filenames
+  const sanitizeTitle = (title: string) => {
+    return title.replace(/:/g, ' -').replace(/[<>:"/\\|?*]/g, ' ').replace(/\s+/g, ' ').trim();
+  };
+
   // File selection handlers for bulk rename
   const handleEpisodeFileSelected = (file: File, filePath: string | undefined, episode: any) => {
-    const suggestedName = `S${String(selectedSeason?.season_number || 1).padStart(2, '0')}E${String(episode.episode_number).padStart(2, '0')} - ${episode.name} (${quality})`;
+    const cleanEpisodeName = sanitizeTitle(episode.name || 'Unknown Episode');
+    const suggestedName = `S${String(selectedSeason?.season_number || 1).padStart(2, '0')}E${String(episode.episode_number).padStart(2, '0')} - ${cleanEpisodeName} (${quality})`;
     addFile(file, suggestedName, 'episode', episode, filePath);
   };
 

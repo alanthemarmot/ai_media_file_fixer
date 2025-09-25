@@ -6,6 +6,13 @@
   overflow: hidden;
 }
 
+/* Search input focus styling fix */
+.search-input-focus:focus {
+  border: 2px solid #3B82F6 !important;
+  box-shadow: 0 0 0 1px #3B82F6 !important;
+  outline: none !important;
+}
+
 /* Electron-specific styles */
 @media (max-width: 1500px) {
   #root {
