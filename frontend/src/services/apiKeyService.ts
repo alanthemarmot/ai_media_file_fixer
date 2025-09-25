@@ -59,7 +59,7 @@ export const checkServerApiKey = async (): Promise<boolean> => {
  */
 export const validateApiKey = async (apiKey: string): Promise<boolean> => {
   try {
-    const response = await fetch(`/api/validate-key?api_key=${apiKey}`);
+    const response = await fetch(`http://localhost:8000/api/validate-key?api_key=${apiKey}`);
     const data = await response.json();
     return data.valid === true;
   } catch (error) {
