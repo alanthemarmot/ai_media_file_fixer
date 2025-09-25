@@ -27,7 +27,7 @@ async function createWindow() {
 
   const mainWindow = new BrowserWindow({
     width: 1500,
-    height:1200,
+    height: 1200,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -36,8 +36,12 @@ async function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     },
     icon: iconPath,
-    show: false, // Don't show until ready
-    titleBarStyle: 'default'
+    show: true, // Show immediately to debug
+    titleBarStyle: 'default',
+    center: true, // Center the window
+    resizable: true,
+    minimizable: true,
+    maximizable: true
   });
 
   // Load the app: prefer Vite dev server if available, otherwise fall back to built files
@@ -73,7 +77,16 @@ async function createWindow() {
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    mainWindow.focus(); // Ensure window gets focus
   });
+
+  // Force show after a delay if ready-to-show doesn't fire
+  setTimeout(() => {
+    if (!mainWindow.isVisible()) {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  }, 3000);
 
   // Handle external links
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {

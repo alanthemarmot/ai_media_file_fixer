@@ -264,7 +264,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 flex flex-col justify-center">
+    <div className="h-full bg-gray-100 dark:bg-gray-900 flex flex-col overflow-hidden">
       {apiKeyStatus === 'missing' ? (
         <ApiKeySetup 
           onComplete={() => setApiKeyStatus('present')}
@@ -275,11 +275,11 @@ function App() {
           <p>Loading...</p>
         </div>
       ) : (
-        <div className="relative py-3 max-w-7xl mx-auto w-full min-w-[800px]">
-          <div className="relative px-4 py-10 bg-white dark:bg-gray-800 shadow-lg sm:rounded-3xl sm:p-20 overflow-x-hidden" ref={mainContentRef}>
-            <div className="max-w-5xl mx-auto min-w-[700px]">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                <div className="py-8 text-base leading-6 space-y-4 text-gray-700 dark:text-gray-300 sm:text-lg sm:leading-7">
+        <div className="relative py-3 max-w-7xl mx-auto w-full flex-1 flex flex-col overflow-hidden min-w-[800px]">
+          <div className="relative px-4 py-6 bg-white dark:bg-gray-800 shadow-lg sm:rounded-3xl sm:px-8 sm:py-10 flex-1 flex flex-col overflow-hidden" ref={mainContentRef}>
+            <div className="max-w-5xl mx-auto flex-1 flex flex-col overflow-hidden min-w-[700px]">
+              <div className="divide-y divide-gray-200 dark:divide-gray-700 flex-1 flex flex-col overflow-hidden">
+                <div className="py-4 text-base leading-6 space-y-4 text-gray-700 dark:text-gray-300 sm:text-lg sm:leading-7 flex-1 flex flex-col overflow-hidden">
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">
                       <img 
@@ -315,7 +315,7 @@ function App() {
                     />
                   )}
                   
-                  <div className="mt-8 min-h-[400px]">
+                  <div className="mt-4 flex-1 overflow-y-auto pb-32 min-h-[500px]">
                     {view === 'results' && (
                       <ResultsList results={searchResults} onSelect={handleSelect} />
                     )}

@@ -13,8 +13,11 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
 
   if (results.length === 0) {
     return (
-      <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-        No results to display
+      <div className="text-center text-gray-500 dark:text-gray-400 py-16 min-h-[400px] flex items-center justify-center">
+        <div className="space-y-4">
+          <div className="text-xl font-light">No results to display</div>
+          <div className="text-sm opacity-75">Search for movies, TV shows, or people to get started</div>
+        </div>
       </div>
     );
   }
