@@ -333,13 +333,22 @@ function App() {
                             onSelect={handleSeasonSelect}
                             selectedSeason={selectedSeason?.season_number}
                             seriesTitle={selectedItem.title}
-                            seriesYear={selectedItem.year}
                             network={selectedItem.network}
                             genres={selectedItem.genres}
                             cast={selectedItem.cast}
                             crew={selectedItem.crew}
                             quality={quality}
                             onQualityChange={handleQualityChange}
+                            first_air_date={selectedItem.first_air_date}
+                            last_air_date={selectedItem.last_air_date}
+                            episode_run_time={selectedItem.episode_run_time}
+                            number_of_seasons={selectedItem.number_of_seasons}
+                            number_of_episodes={selectedItem.number_of_episodes}
+                            vote_average={selectedItem.vote_average}
+                            vote_count={selectedItem.vote_count}
+                            tagline={selectedItem.tagline}
+                            status={selectedItem.status}
+                            keywords={selectedItem.keywords}
                             onPersonSelect={async (personId: number, personName: string) => {
                               // Navigate to person's filmography
                               const personItem = {

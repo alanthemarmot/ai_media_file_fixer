@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { type SearchResult, type MediaDetails, getMediaDetails } from '../api';
+import { type SearchResult, type MediaDetails, type MovieDetails, getMediaDetails } from '../api';
 import FileSelectionButton from './FileSelectionButton';
 
 interface DisplayAreaProps {
@@ -140,22 +140,64 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
         <>
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Media Details</h2>
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-gray-900 dark:text-gray-100">
-        {'episode_title' in details ? (
+        {selectedItem.media_type === 'tv' ? (
           // TV Show details
           <div className="space-y-2">
             <p>
               <span className="font-medium">Series:</span> {details.title}
             </p>
             <p>
-              <span className="font-medium">Network:</span> {details.network}
+              <span className="font-medium">Network:</span> {(details as any).network}
             </p>
-            <p>
-              <span className="font-medium">Episode:</span> S{details.season.toString().padStart(2, '0')}E
-              {details.episode.toString().padStart(2, '0')} - {details.episode_title}
-            </p>
+            {(details as any).first_air_date && (
+              <p>
+                <span className="font-medium">First Aired:</span> {new Date((details as any).first_air_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            )}
+            {(details as any).last_air_date && (
+              <p>
+                <span className="font-medium">Last Aired:</span> {new Date((details as any).last_air_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            )}
+            {(details as any).episode_run_time && (
+              <p>
+                <span className="font-medium">Episode Runtime:</span> {(details as any).episode_run_time} minutes
+              </p>
+            )}
+            {(details as any).number_of_seasons && (
+              <p>
+                <span className="font-medium">Seasons:</span> {(details as any).number_of_seasons} {(details as any).number_of_episodes && `(${(details as any).number_of_episodes} episodes)`}
+              </p>
+            )}
+            {(details as any).vote_average !== undefined && (
+              <p>
+                <span className="font-medium">Rating:</span> {(details as any).vote_average.toFixed(1)}/10 {(details as any).vote_count && `(${(details as any).vote_count.toLocaleString()} votes)`}
+              </p>
+            )}
+            {(details as any).status && (
+              <p>
+                <span className="font-medium">Status:</span> {(details as any).status}
+              </p>
+            )}
+            {(details as any).tagline && (
+              <p>
+                <span className="font-medium">Tagline:</span> <em>"{(details as any).tagline}"</em>
+              </p>
+            )}
+            {(details as any).season && (details as any).episode && (details as any).episode_title && (
+              <p>
+                <span className="font-medium">Latest Episode:</span> S{(details as any).season.toString().padStart(2, '0')}E
+                {(details as any).episode.toString().padStart(2, '0')} - {(details as any).episode_title}
+              </p>
+            )}
             {details.genres && details.genres.length > 0 && (
               <p>
                 <span className="font-medium">Genres:</span> {details.genres.join(', ')}
+              </p>
+            )}
+            {(details as any).keywords && (details as any).keywords.length > 0 && (
+              <p>
+                <span className="font-medium">Keywords:</span> {(details as any).keywords.slice(0, 10).join(', ')}{(details as any).keywords.length > 10 ? '...' : ''}
               </p>
             )}
             {details.cast && details.cast.length > 0 && (
@@ -207,14 +249,52 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
                 )}
               </div>
             )}
-            <div className="mt-4">
-              <p className="font-medium">Suggested filename:</p>
-              <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
-                {`${sanitizeTitle(details.title)} - S${details.season.toString().padStart(2, '0')}E${details.episode
-                  .toString()
-                  .padStart(2, '0')} - ${sanitizeTitle(details.episode_title || 'Unknown Episode')} (${selectedQuality})`}
-              </code>
+            {/* Quality selector for TV shows */}
+            <div className="mb-3">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">Select quality format:</label>
+              <div className="flex justify-center space-x-4">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="tv-quality"
+                    checked={selectedQuality === '720p'}
+                    onChange={() => handleQualityChange('720p')}
+                  />
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">720p</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="tv-quality"
+                    checked={selectedQuality === '1080p'}
+                    onChange={() => handleQualityChange('1080p')}
+                  />
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">1080p</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    className="form-radio text-blue-600"
+                    name="tv-quality"
+                    checked={selectedQuality === '2160p'}
+                    onChange={() => handleQualityChange('2160p')}
+                  />
+                  <span className="ml-2 text-gray-700 dark:text-gray-300">2160p</span>
+                </label>
+              </div>
             </div>
+            {(details as any).season && (details as any).episode && (details as any).episode_title && (
+              <div className="mt-4">
+                <p className="font-medium">Latest Episode Filename:</p>
+                <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
+                  {`${sanitizeTitle(details.title)} - S${(details as any).season.toString().padStart(2, '0')}E${(details as any).episode
+                    .toString()
+                    .padStart(2, '0')} - ${sanitizeTitle((details as any).episode_title || 'Unknown Episode')} (${selectedQuality})`}
+                </code>
+              </div>
+            )}
           </div>
         ) : (
           // Movie details
@@ -223,11 +303,36 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
               <span className="font-medium">Title:</span> {details.title}
             </p>
             <p>
-              <span className="font-medium">Year:</span> {details.year}
+              <span className="font-medium">Year:</span> {(details as MovieDetails).year}
             </p>
+            {'release_date' in details && details.release_date && (
+              <p>
+                <span className="font-medium">Release Date:</span> {new Date(details.release_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            )}
+            {'runtime' in details && details.runtime && (
+              <p>
+                <span className="font-medium">Runtime:</span> {details.runtime} minutes
+              </p>
+            )}
+            {'vote_average' in details && details.vote_average !== undefined && (
+              <p>
+                <span className="font-medium">Rating:</span> {details.vote_average.toFixed(1)}/10 {details.vote_count && `(${details.vote_count.toLocaleString()} votes)`}
+              </p>
+            )}
+            {'tagline' in details && details.tagline && (
+              <p>
+                <span className="font-medium">Tagline:</span> <em>"{details.tagline}"</em>
+              </p>
+            )}
             {details.genres && details.genres.length > 0 && (
               <p>
                 <span className="font-medium">Genres:</span> {details.genres.join(', ')}
+              </p>
+            )}
+            {(details as any).keywords && (details as any).keywords.length > 0 && (
+              <p>
+                <span className="font-medium">Keywords:</span> {(details as any).keywords.slice(0, 10).join(', ')}{(details as any).keywords.length > 10 ? '...' : ''}
               </p>
             )}
             {details.cast && details.cast.length > 0 && (
@@ -318,7 +423,7 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
             <div className="mt-4">
               <p className="font-medium">Suggested filename:</p>
               <code className="block bg-gray-100 dark:bg-gray-600 dark:text-gray-100 p-2 rounded mt-1">
-                {`${sanitizeTitle(details.title || 'Unknown Movie')} [${details.year}](${selectedQuality})`}
+                {`${sanitizeTitle(details.title || 'Unknown Movie')} [${(details as MovieDetails).year}](${selectedQuality})`}
               </code>
             </div>
           </div>

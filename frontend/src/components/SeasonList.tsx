@@ -16,7 +16,6 @@ interface SeasonListProps {
   onSelect: (season: TVSeason) => void;
   selectedSeason?: number;
   seriesTitle?: string;
-  seriesYear?: number;
   network?: string;
   genres?: string[];
   cast?: CastMember[];
@@ -25,6 +24,17 @@ interface SeasonListProps {
   quality?: '720p' | '1080p' | '2160p';
   onPersonSelect?: (personId: number, personName: string) => void;
   onFileSelected?: (file: File, filePath: string | undefined, directoryName: string) => void;
+  // Additional TV show details
+  first_air_date?: string;
+  last_air_date?: string;
+  episode_run_time?: number;
+  number_of_seasons?: number;
+  number_of_episodes?: number;
+  vote_average?: number;
+  vote_count?: number;
+  tagline?: string;
+  status?: string;
+  keywords?: string[];
 }
 
 export default function SeasonList({
@@ -32,7 +42,6 @@ export default function SeasonList({
   onSelect,
   selectedSeason,
   seriesTitle = '',
-  seriesYear,
   network = '',
   genres,
   cast,
@@ -40,7 +49,17 @@ export default function SeasonList({
   onQualityChange,
   quality = '1080p',
   onPersonSelect,
-  onFileSelected
+  onFileSelected,
+  first_air_date,
+  last_air_date,
+  episode_run_time,
+  number_of_seasons,
+  number_of_episodes,
+  vote_average,
+  vote_count,
+  tagline,
+  status,
+  keywords
 }: SeasonListProps) {
   const [copied, setCopied] = useState(false);
   const [copiedSeason, setCopiedSeason] = useState<number | null>(null);
@@ -105,21 +124,56 @@ export default function SeasonList({
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-gray-900 dark:text-gray-100">
             <div className="space-y-2">
               <p>
-                <span className="font-medium">Title:</span> {seriesTitle}
+                <span className="font-medium">Series:</span> {seriesTitle}
               </p>
-              {seriesYear && (
-                <p>
-                  <span className="font-medium">Year:</span> {seriesYear}
-                </p>
-              )}
               {network && (
                 <p>
                   <span className="font-medium">Network:</span> {network}
                 </p>
               )}
+              {first_air_date && (
+                <p>
+                  <span className="font-medium">First Aired:</span> {new Date(first_air_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              )}
+              {last_air_date && (
+                <p>
+                  <span className="font-medium">Last Aired:</span> {new Date(last_air_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              )}
+              {episode_run_time && (
+                <p>
+                  <span className="font-medium">Episode Runtime:</span> {episode_run_time} minutes
+                </p>
+              )}
+              {number_of_seasons && (
+                <p>
+                  <span className="font-medium">Seasons:</span> {number_of_seasons} {number_of_episodes && `(${number_of_episodes} episodes)`}
+                </p>
+              )}
+              {vote_average !== undefined && (
+                <p>
+                  <span className="font-medium">Rating:</span> {vote_average.toFixed(1)}/10 {vote_count && `(${vote_count.toLocaleString()} votes)`}
+                </p>
+              )}
+              {status && (
+                <p>
+                  <span className="font-medium">Status:</span> {status}
+                </p>
+              )}
+              {tagline && (
+                <p>
+                  <span className="font-medium">Tagline:</span> <em>"{tagline}"</em>
+                </p>
+              )}
               {genres && genres.length > 0 && (
                 <p>
                   <span className="font-medium">Genres:</span> {genres.join(', ')}
+                </p>
+              )}
+              {keywords && keywords.length > 0 && (
+                <p>
+                  <span className="font-medium">Keywords:</span> {keywords.slice(0, 10).join(', ')}{keywords.length > 10 ? '...' : ''}
                 </p>
               )}
               {cast && cast.length > 0 && (
