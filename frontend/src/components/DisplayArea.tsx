@@ -115,31 +115,31 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
     );
   }
 
-  if (!details) {
-    return null;
-  }
-
   return (
     <div className="space-y-4">
       {/* Display poster and title at the top */}
       <div className="flex flex-col items-center mb-6">
         <div className="flex items-center gap-4">
-          {selectedItem.poster_path && (
-            <img
-              src={`https://image.tmdb.org/t/p/w154${selectedItem.poster_path}`}
-              alt={details ? details.title : selectedItem.title}
-              className="w-24 h-36 object-cover rounded shadow"
-            />
-          )}
-          <div className="flex items-center">
-            <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-              {details ? details.title : selectedItem.title} {!('episode_title' in details) && details.year ? `[${details.year}]` : ''}
-            </h2>
-          </div>
+          {(() => {
+            const posterPath = details?.poster_path || selectedItem.poster_path;
+            return posterPath ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w154${posterPath}`}
+                alt={details ? details.title : selectedItem.title}
+                className="w-24 h-36 object-cover rounded shadow"
+              />
+            ) : null;
+          })()}
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+            {details ? details.title : selectedItem.title} {((details && 'year' in details && details.year) || selectedItem.year) ? `[${(details && 'year' in details && details.year) || selectedItem.year}]` : ''}
+          </h2>
         </div>
       </div>
-      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Media Details</h2>
-      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-gray-900 dark:text-gray-100">
+
+      {details ? (
+        <>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Media Details</h2>
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-gray-900 dark:text-gray-100">
         {'episode_title' in details ? (
           // TV Show details
           <div className="space-y-2">
@@ -324,29 +324,35 @@ export default function DisplayArea({ selectedItem, quality = '1080p', onPersonS
           </div>
         )}
       </div>
-      <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated filename:</h3>
-        <div className="flex items-center space-x-2">
-          <FileSelectionButton
-            onFileSelected={(file, filePath) => handleFileSelectedForMovie(file, filePath)}
-            className="flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors"
-          />
-          <button
-            onClick={copyToClipboard}
-            className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
-          >
-            {copied ? (
-              <CheckIcon className="w-5 h-5 text-white" />
-            ) : (
-              <ClipboardIcon className="w-5 h-5" />
-            )}
-            <span>{copied ? 'Copied!' : 'Copy'}</span>
-          </button>
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Generated filename:</h3>
+            <div className="flex items-center space-x-2">
+              <FileSelectionButton
+                onFileSelected={(file, filePath) => handleFileSelectedForMovie(file, filePath)}
+                className="flex items-center space-x-1 text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition-colors"
+              />
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center space-x-1 text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition-colors"
+              >
+                {copied ? (
+                  <CheckIcon className="w-5 h-5 text-white" />
+                ) : (
+                  <ClipboardIcon className="w-5 h-5" />
+                )}
+                <span>{copied ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+          </div>
+          <div className="mt-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm text-gray-900 dark:text-gray-100">
+            {fileName}
+          </div>
+        </>
+      ) : (
+        <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+          Unable to load detailed information for this item.
         </div>
-      </div>
-      <div className="mt-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 font-mono text-sm text-gray-900 dark:text-gray-100">
-        {fileName}
-      </div>
+      )}
     </div>
   );
 }
