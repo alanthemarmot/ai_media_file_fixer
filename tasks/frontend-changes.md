@@ -201,11 +201,20 @@
 4. Toast notifications for user feedback
 
 ### Phase 2: Enhanced UX (Medium Priority)
-1. 🚧 Advanced search filters UI - **IN PROGRESS**
-2. Batch operations interface
-3. Keyboard shortcuts implementation
-4. Drag-and-drop functionality
-5. Responsive design improvements
+1. ✅ Advanced search filters UI - **COMPLETED** (Implemented as Randomizer feature)
+   - Collapsible FilterPanel component
+   - Media type selector (TV Shows/Movies)
+   - Optional genre filter
+   - New/Old release period toggle
+   - Returns 10 random results based on filters
+2. ✅ Rating display on all media cards - **COMPLETED**
+   - Vote average with star icon on ResultsList
+   - Vote average with star icon on Filmography
+   - Consistent yellow star styling across app
+3. Batch operations interface
+4. Keyboard shortcuts implementation
+5. Drag-and-drop functionality
+6. Responsive design improvements
 
 ### Phase 3: Performance & Polish (Lower Priority)
 1. Virtual scrolling for large lists

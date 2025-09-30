@@ -198,7 +198,11 @@
 
 ### Phase 2: Enhanced UX (Medium Priority)
 1. ✅ Dark/light theme toggle - **COMPLETED**
-2. Advanced search filters
+2. ✅ Advanced search filters - **COMPLETED** (Implemented as Randomizer)
+   - Genre-based filtering
+   - Time-based filtering (New/Old)
+   - Media type selection (TV/Movies)
+   - Random result selection (10 items)
 3. Batch operations UI
 4. Keyboard shortcuts (moved to lower priority)
 
