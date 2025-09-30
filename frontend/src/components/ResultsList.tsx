@@ -58,6 +58,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
         <nav className="flex w-full">
           <button
             onClick={() => setActiveTab('tv')}
+            data-testid="tv-tab"
             className={`flex-1 py-3 px-4 font-medium text-md text-center ${
               activeTab === 'tv'
                 ? 'bg-blue-600 text-white'
@@ -68,6 +69,7 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
           </button>
           <button
             onClick={() => setActiveTab('movies')}
+            data-testid="movies-tab"
             className={`flex-1 py-3 px-4 font-medium text-md text-center ${
               activeTab === 'movies'
                 ? 'bg-blue-600 text-white'

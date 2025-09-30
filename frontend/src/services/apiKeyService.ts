@@ -59,11 +59,19 @@ export const checkServerApiKey = async (): Promise<boolean> => {
  */
 export const validateApiKey = async (apiKey: string): Promise<boolean> => {
   try {
+    // First try the backend server validation
     const response = await fetch(`http://localhost:8000/api/validate-key?api_key=${apiKey}`);
     const data = await response.json();
     return data.valid === true;
   } catch (error) {
-    console.error('Error validating API key:', error);
-    return false;
+    // If backend is unavailable, validate directly with TMDb API
+    console.log('Backend unavailable, validating directly with TMDb API');
+    try {
+      const directResponse = await fetch(`https://api.themoviedb.org/3/configuration?api_key=${apiKey}`);
+      return directResponse.ok && directResponse.status === 200;
+    } catch (directError) {
+      console.error('Error validating API key directly:', directError);
+      return false;
+    }
   }
 };

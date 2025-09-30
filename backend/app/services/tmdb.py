@@ -223,11 +223,12 @@ class TMDBService:
         """Get detailed information for a movie or TV show with enhanced error handling"""
         try:
             if media_type == "movie":
-                # Get movie details and credits concurrently
+                # Get movie details, credits, and keywords concurrently
                 details_task = self._make_request(f"/movie/{id}", {})
                 credits_task = self._make_request(f"/movie/{id}/credits", {})
+                keywords_task = self._make_request(f"/movie/{id}/keywords", {})
 
-                data, credits_data = await asyncio.gather(details_task, credits_task)
+                data, credits_data, keywords_data = await asyncio.gather(details_task, credits_task, keywords_task)
 
                 # Extract top cast (limit to 15 actors)
                 cast = []
@@ -271,21 +272,32 @@ class TMDBService:
                 # Extract genres
                 genres = [genre["name"] for genre in data.get("genres", [])]
 
+                # Extract keywords
+                keywords = [keyword["name"] for keyword in keywords_data.get("keywords", [])]
+
                 return {
                     "title": data["title"],
                     "year": int(data["release_date"][:4])
                     if data.get("release_date")
                     else None,
+                    "release_date": data.get("release_date"),
+                    "runtime": data.get("runtime"),
+                    "vote_average": data.get("vote_average"),
+                    "vote_count": data.get("vote_count"),
+                    "tagline": data.get("tagline"),
+                    "poster_path": data.get("poster_path"),
                     "genres": genres,
+                    "keywords": keywords,
                     "cast": cast,
                     "crew": crew,
                 }
             else:  # TV Show
-                # Get show details and credits concurrently
+                # Get show details, credits, and keywords concurrently
                 details_task = self._make_request(f"/tv/{id}", {})
                 credits_task = self._make_request(f"/tv/{id}/credits", {})
+                keywords_task = self._make_request(f"/tv/{id}/keywords", {})
 
-                data, credits_data = await asyncio.gather(details_task, credits_task)
+                data, credits_data, keywords_data = await asyncio.gather(details_task, credits_task, keywords_task)
 
                 # Extract top cast (limit to 15 actors)
                 cast = []
@@ -329,6 +341,9 @@ class TMDBService:
                 # Extract genres
                 genres = [genre["name"] for genre in data.get("genres", [])]
 
+                # Extract keywords (TV shows use 'results' field)
+                keywords = [keyword["name"] for keyword in keywords_data.get("results", [])]
+
                 # Get latest season/episode info safely
                 latest_season = None
                 latest_episode = None
@@ -349,6 +364,15 @@ class TMDBService:
 
                 return {
                     "title": data["name"],
+                    "first_air_date": data.get("first_air_date"),
+                    "last_air_date": data.get("last_air_date"),
+                    "episode_run_time": data.get("episode_run_time", [None])[0] if data.get("episode_run_time") and len(data.get("episode_run_time", [])) > 0 else None,
+                    "number_of_seasons": data.get("number_of_seasons"),
+                    "number_of_episodes": data.get("number_of_episodes"),
+                    "vote_average": data.get("vote_average"),
+                    "vote_count": data.get("vote_count"),
+                    "tagline": data.get("tagline"),
+                    "status": data.get("status"),
                     "network": data.get("networks", [{}])[0].get("name")
                     if data.get("networks")
                     else None,
@@ -357,7 +381,9 @@ class TMDBService:
                     if latest_episode
                     else None,
                     "episode_title": latest_episode["name"] if latest_episode else None,
+                    "poster_path": data.get("poster_path"),
                     "genres": genres,
+                    "keywords": keywords,
                     "cast": cast,
                     "crew": crew,
                 }

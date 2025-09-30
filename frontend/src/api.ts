@@ -8,14 +8,14 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add request interceptor to add API key header if available
-api.interceptors.request.use((config) => {
-  const apiKey = getApiKey();
-  if (apiKey) {
-    config.headers['x-api-key'] = apiKey;
-  }
-  return config;
-});
+// Request interceptor - commented out to let server use its own API key
+// api.interceptors.request.use((config) => {
+//   const apiKey = getApiKey();
+//   if (apiKey) {
+//     config.headers['x-api-key'] = apiKey;
+//   }
+//   return config;
+// });
 
 export interface SearchResult {
   id: number;
@@ -50,18 +50,36 @@ export interface CrewInfo {
 export interface MovieDetails {
   title: string;
   year: number;
+  release_date?: string;
+  runtime?: number;
+  vote_average?: number;
+  vote_count?: number;
+  tagline?: string;
+  poster_path?: string;
   genres: string[];
+  keywords?: string[];
   cast: CastMember[];
   crew: CrewInfo;
 }
 
 export interface TVShowDetails {
   title: string;
+  first_air_date?: string;
+  last_air_date?: string;
+  episode_run_time?: number;
+  number_of_seasons?: number;
+  number_of_episodes?: number;
+  vote_average?: number;
+  vote_count?: number;
+  tagline?: string;
+  status?: string;
   network: string;
   season: number;
   episode: number;
   episode_title: string;
+  poster_path?: string;
   genres: string[];
+  keywords?: string[];
   cast: CastMember[];
   crew: CrewInfo;
 }
@@ -122,9 +140,39 @@ export const validateApiKey = async (apiKey: string): Promise<boolean> => {
     });
     return response.data.valid === true;
   } catch (error) {
-    console.error('Error validating API key:', error);
-    return false;
+    // If backend is unavailable, validate directly with TMDb API
+    console.log('Backend unavailable, validating directly with TMDb API');
+    try {
+      const directResponse = await fetch(`https://api.themoviedb.org/3/configuration?api_key=${apiKey}`);
+      return directResponse.ok && directResponse.status === 200;
+    } catch (directError) {
+      console.error('Error validating API key directly:', directError);
+      return false;
+    }
   }
+};
+
+// Direct TMDb API search fallback
+const searchMediaDirect = async (query: string, apiKey: string): Promise<SearchResult[]> => {
+  const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}`);
+  if (!response.ok) {
+    throw new Error('Failed to search TMDb API directly');
+  }
+  const data = await response.json();
+
+  // Transform the results to match our interface
+  return data.results.map((item: any) => ({
+    id: item.id,
+    media_type: item.media_type,
+    title: item.title || item.name,
+    name: item.name,
+    year: item.release_date ? new Date(item.release_date).getFullYear() :
+          item.first_air_date ? new Date(item.first_air_date).getFullYear() : undefined,
+    poster_path: item.poster_path,
+    profile_path: item.profile_path,
+    known_for_department: item.known_for_department,
+    popularity: item.popularity
+  }));
 };
 
 export const searchMedia = async (query: string): Promise<SearchResult[]> => {
@@ -136,7 +184,13 @@ export const searchMedia = async (query: string): Promise<SearchResult[]> => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.code === 'ECONNREFUSED') {
-        throw new Error('Unable to connect to the server. Is the backend running?');
+        // Backend unavailable, try direct TMDb API call
+        const apiKey = getApiKey();
+        if (apiKey) {
+          console.log('Backend unavailable, searching directly with TMDb API');
+          return await searchMediaDirect(query, apiKey);
+        }
+        throw new Error('Unable to connect to the server and no API key configured for direct access.');
       }
       if (error.response?.status === 400 && error.response?.data?.detail?.includes('API key required')) {
         throw new Error('API key is required. Please configure your TMDB API key.');
