@@ -10,6 +10,7 @@ import ApiKeySetup from './components/ApiKeySetup';
 import SettingsModal from './components/SettingsModal';
 import ThemeToggle from './components/ThemeToggle';
 import BulkRenamePanel from './components/BulkRenamePanel';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { useFileRename } from './hooks/useFileRename';
 import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
@@ -323,12 +324,15 @@ function App() {
                   
                   <div className="mt-4 flex-1 overflow-y-auto pb-32 min-h-[500px]">
                     {view === 'results' && (
-                      <ResultsList results={searchResults} onSelect={handleSelect} />
+                      <ErrorBoundary>
+                        <ResultsList results={searchResults} onSelect={handleSelect} />
+                      </ErrorBoundary>
                     )}
                     {view === 'seasons' && selectedItem && selectedItem.media_type === 'tv' && (
-                      <div className="flex flex-col min-h-[400px] h-full">
-                        <div className="flex-1">
-                          <SeasonList
+                      <ErrorBoundary>
+                        <div className="flex flex-col min-h-[400px] h-full">
+                          <div className="flex-1">
+                            <SeasonList
                             seasons={seasons}
                             onSelect={handleSeasonSelect}
                             selectedSeason={selectedSeason?.season_number}
@@ -361,16 +365,18 @@ function App() {
                             }}
                             onFileSelected={handleDirectoryFileSelected}
                           />
+                          </div>
                         </div>
-                      </div>
+                      </ErrorBoundary>
                     )}
                     {view === 'episodes' && selectedItem && selectedSeason && (
-                      <div className="flex flex-col min-h-[400px] h-full">
-                        <div className="flex-1">
-                          {loadingEpisodes ? (
-                            <div className="text-center text-gray-500 py-4">Loading episodes...</div>
-                          ) : episodes.length > 0 ? (
-                            <EpisodeList
+                      <ErrorBoundary>
+                        <div className="flex flex-col min-h-[400px] h-full">
+                          <div className="flex-1">
+                            {loadingEpisodes ? (
+                              <div className="text-center text-gray-500 py-4">Loading episodes...</div>
+                            ) : episodes.length > 0 ? (
+                              <EpisodeList
                               episodes={episodes}
                               seriesTitle={selectedItem.title}
                               seriesYear={selectedItem.year}
@@ -385,16 +391,18 @@ function App() {
                           ) : (
                             <div className="text-center text-gray-500 py-4">No episodes found</div>
                           )}
+                          </div>
                         </div>
-                      </div>
+                      </ErrorBoundary>
                     )}
                     {view === 'episodes' && selectedItem && !selectedSeason && (
                       <div className="text-center text-gray-500 py-4">Loading season information...</div>
                     )}
                     {view === 'details' && selectedItem && (
-                      <div className="flex flex-col min-h-[400px] h-full">
-                        <div className="flex-1">
-                          <DisplayArea
+                      <ErrorBoundary>
+                        <div className="flex flex-col min-h-[400px] h-full">
+                          <div className="flex-1">
+                            <DisplayArea
                             selectedItem={selectedItem}
                             quality={quality}
                             onPersonSelect={async (personId: number, personName: string) => {
@@ -408,24 +416,27 @@ function App() {
                             }}
                             onFileSelected={handleMovieFileSelected}
                           />
+                          </div>
                         </div>
-                      </div>
+                      </ErrorBoundary>
                     )}
                     {view === 'filmography' && selectedItem && selectedItem.media_type === 'person' && (
-                      <div className="flex flex-col min-h-[400px] h-full">
-                        <div className="flex-1">
-                          {loadingFilmography ? (
-                            <div className="text-center text-gray-500 py-4">Loading filmography...</div>
-                          ) : personFilmography ? (
-                            <Filmography 
+                      <ErrorBoundary>
+                        <div className="flex flex-col min-h-[400px] h-full">
+                          <div className="flex-1">
+                            {loadingFilmography ? (
+                              <div className="text-center text-gray-500 py-4">Loading filmography...</div>
+                            ) : personFilmography ? (
+                              <Filmography 
                               filmography={personFilmography} 
                               onItemSelect={handleFilmographyItemSelect}
                             />
                           ) : (
                             <div className="text-center text-gray-500 py-4">No filmography found</div>
                           )}
+                          </div>
                         </div>
-                      </div>
+                      </ErrorBoundary>
                     )}
                   </div>
                   <div className="mt-4">
