@@ -11,6 +11,7 @@ import SettingsModal from './components/SettingsModal';
 import ThemeToggle from './components/ThemeToggle';
 import BulkRenamePanel from './components/BulkRenamePanel';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { SkeletonDetails, SkeletonEpisodeList } from './components/SkeletonLoader';
 import { useFileRename } from './hooks/useFileRename';
 import type { BreadcrumbItem } from './components/Breadcrumb';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
@@ -279,7 +280,10 @@ function App() {
         />
       ) : apiKeyStatus === 'checking' ? (
         <div className="flex justify-center items-center h-screen">
-          <p>Loading...</p>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading application...</p>
+          </div>
         </div>
       ) : (
         <div className="relative py-3 max-w-7xl mx-auto w-full flex-1 flex flex-col overflow-hidden min-w-[800px]">
@@ -374,7 +378,7 @@ function App() {
                         <div className="flex flex-col min-h-[400px] h-full">
                           <div className="flex-1">
                             {loadingEpisodes ? (
-                              <div className="text-center text-gray-500 py-4">Loading episodes...</div>
+                              <SkeletonEpisodeList />
                             ) : episodes.length > 0 ? (
                               <EpisodeList
                               episodes={episodes}
@@ -396,7 +400,10 @@ function App() {
                       </ErrorBoundary>
                     )}
                     {view === 'episodes' && selectedItem && !selectedSeason && (
-                      <div className="text-center text-gray-500 py-4">Loading season information...</div>
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                        <p className="text-gray-500 dark:text-gray-400">Loading season information...</p>
+                      </div>
                     )}
                     {view === 'details' && selectedItem && (
                       <ErrorBoundary>
@@ -425,7 +432,7 @@ function App() {
                         <div className="flex flex-col min-h-[400px] h-full">
                           <div className="flex-1">
                             {loadingFilmography ? (
-                              <div className="text-center text-gray-500 py-4">Loading filmography...</div>
+                              <SkeletonDetails />
                             ) : personFilmography ? (
                               <Filmography 
                               filmography={personFilmography} 
