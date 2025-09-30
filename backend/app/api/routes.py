@@ -207,3 +207,88 @@ async def validate_filename(request: ValidateFilenameRequest):
             status_code=500,
             detail=f"Error validating filename: {str(e)}"
         )
+
+
+@router.get("/genres/{media_type}")
+async def get_genres(media_type: str, x_api_key: Optional[str] = Header(None)):
+    """Get list of genres for movies or TV shows"""
+    if media_type not in ["movie", "tv"]:
+        raise HTTPException(status_code=400, detail="Invalid media type. Use 'movie' or 'tv'.")
+
+    try:
+        # Use the provided API key if available, otherwise use the server's key
+        api_key = x_api_key or settings.TMDB_API_KEY
+
+        if not api_key:
+            raise HTTPException(
+                status_code=400,
+                detail="API key required. Please provide API key in X-API-Key header.",
+            )
+
+        service = TMDBService(api_key=api_key) if x_api_key else tmdb_service
+        if not service:
+            service = TMDBService(api_key=api_key)
+
+        genres = await service.get_genres(media_type)
+        return genres
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/discover/{media_type}")
+async def discover_media(
+    media_type: str,
+    x_api_key: Optional[str] = Header(None),
+    with_genres: Optional[str] = None,
+    year: Optional[int] = None,
+    primary_release_year: Optional[int] = None,
+    first_air_date_year: Optional[int] = None,
+    vote_average_gte: Optional[float] = None,
+    vote_average_lte: Optional[float] = None,
+    with_runtime_gte: Optional[int] = None,
+    with_runtime_lte: Optional[int] = None,
+    sort_by: Optional[str] = None,
+):
+    """Discover movies or TV shows with filters"""
+    if media_type not in ["movie", "tv"]:
+        raise HTTPException(status_code=400, detail="Invalid media type. Use 'movie' or 'tv'.")
+
+    try:
+        # Use the provided API key if available, otherwise use the server's key
+        api_key = x_api_key or settings.TMDB_API_KEY
+
+        if not api_key:
+            raise HTTPException(
+                status_code=400,
+                detail="API key required. Please provide API key in X-API-Key header.",
+            )
+
+        service = TMDBService(api_key=api_key) if x_api_key else tmdb_service
+        if not service:
+            service = TMDBService(api_key=api_key)
+
+        # Build filter params
+        filters = {}
+        if with_genres:
+            filters["with_genres"] = with_genres
+        if year:
+            filters["year"] = year
+        if primary_release_year:
+            filters["primary_release_year"] = primary_release_year
+        if first_air_date_year:
+            filters["first_air_date_year"] = first_air_date_year
+        if vote_average_gte is not None:
+            filters["vote_average.gte"] = vote_average_gte
+        if vote_average_lte is not None:
+            filters["vote_average.lte"] = vote_average_lte
+        if with_runtime_gte is not None:
+            filters["with_runtime.gte"] = with_runtime_gte
+        if with_runtime_lte is not None:
+            filters["with_runtime.lte"] = with_runtime_lte
+        if sort_by:
+            filters["sort_by"] = sort_by
+
+        results = await service.discover_media(media_type, filters)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -27,6 +27,8 @@ export interface SearchResult {
   profile_path?: string;
   known_for_department?: string;
   popularity?: number;
+  vote_average?: number;
+  vote_count?: number;
 }
 
 export interface CastMember {
@@ -118,6 +120,7 @@ export interface FilmographyItem {
   job?: string;
   department?: string;
   role_type: 'cast' | 'crew';
+  vote_average?: number;
 }
 
 export interface PersonFilmography {
@@ -288,6 +291,52 @@ export const renameFile = async (originalPath: string, newName: string): Promise
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.detail || 'An error occurred while renaming the file.');
+    }
+    throw error;
+  }
+};
+
+export interface Genre {
+  id: number;
+  name: string;
+}
+
+export interface FilterOptions {
+  with_genres?: string;
+  year?: number;
+  primary_release_year?: number;
+  first_air_date_year?: number;
+  vote_average_gte?: number;
+  vote_average_lte?: number;
+  with_runtime_gte?: number;
+  with_runtime_lte?: number;
+  sort_by?: string;
+}
+
+export const getGenres = async (mediaType: 'movie' | 'tv'): Promise<Genre[]> => {
+  try {
+    const response = await api.get(`/genres/${mediaType}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.detail || 'An error occurred while fetching genres.');
+    }
+    throw error;
+  }
+};
+
+export const discoverMedia = async (
+  mediaType: 'movie' | 'tv',
+  filters: FilterOptions
+): Promise<SearchResult[]> => {
+  try {
+    const response = await api.get(`/discover/${mediaType}`, {
+      params: filters
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.detail || 'An error occurred while discovering media.');
     }
     throw error;
   }

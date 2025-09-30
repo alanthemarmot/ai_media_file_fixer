@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import EnhancedSearchBar from './components/EnhancedSearchBar'
+import FilterPanel from './components/FilterPanel'
 import ResultsList from './components/ResultsList'
 import DisplayArea from './components/DisplayArea'
 import SeasonList from './components/SeasonList'
@@ -18,7 +19,7 @@ import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import './App.css'
 import './components/IconLink.css'
 import mfrIcon from '../images/mfr_icon.png'
-import { getTVSeasons, getTVEpisodes, getMediaDetails, checkServerApiKeyStatus, getPersonFilmography, type FilmographyItem, type PersonFilmography } from './api';
+import { getTVSeasons, getTVEpisodes, getMediaDetails, checkServerApiKeyStatus, getPersonFilmography, discoverMedia, type FilmographyItem, type PersonFilmography, type FilterOptions } from './api';
 import { hasApiKey } from './services/apiKeyService';
 
 function App() {
@@ -71,7 +72,7 @@ function App() {
     setSelectedSeason(null)
     setView('results')
   }
-  
+
   const resetSearch = () => {
     setSearchResults([])
     setSelectedItem(null)
@@ -82,6 +83,29 @@ function App() {
     setView('results')
     setResetSearchCounter(prev => prev + 1)
   }
+
+  const handleFiltersChange = async (filters: FilterOptions, mediaType: 'movie' | 'tv') => {
+    try {
+      const results = await discoverMedia(mediaType, filters);
+
+      // Randomly select 10 results
+      const shuffled = [...results].sort(() => Math.random() - 0.5);
+      const randomTen = shuffled.slice(0, 10);
+
+      setSearchResults(randomTen);
+      setSelectedItem(null);
+      setSeasons([]);
+      setSelectedSeason(null);
+      setView('results');
+    } catch (error) {
+      console.error('Filter search failed:', error);
+      setSearchResults([]);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchResults([]);
+  };
 
   const handleSelect = async (item: any) => {
     setSelectedItem(item);
@@ -318,14 +342,21 @@ function App() {
                   
                   {/* Show EnhancedSearchBar only on home/results page */}
                   {view === 'results' && (
-                    <EnhancedSearchBar 
-                      onSearch={handleSearch} 
-                      resetTrigger={resetSearchCounter} 
-                      onReset={resetSearch} 
-                      hasResults={searchResults.length > 0} 
-                    />
+                    <>
+                      <EnhancedSearchBar
+                        onSearch={handleSearch}
+                        resetTrigger={resetSearchCounter}
+                        onReset={resetSearch}
+                        hasResults={searchResults.length > 0}
+                      />
+                      <FilterPanel
+                        mediaType="all"
+                        onFiltersChange={handleFiltersChange}
+                        onClearFilters={handleClearFilters}
+                      />
+                    </>
                   )}
-                  
+
                   <div className="mt-4 flex-1 overflow-y-auto pb-32 min-h-[500px]">
                     {view === 'results' && (
                       <ErrorBoundary>

@@ -89,3 +89,4 @@ This is an Electron/React application that runs in two modes:
 
 
 CRITICAL: When debugging, you MUST trace through the ENTIRE code flow step by step. No assumptions. No shortcuts.
+- Dont add and commit anything unless given instructions to do so.

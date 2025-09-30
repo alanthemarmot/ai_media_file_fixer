@@ -438,6 +438,7 @@ class TMDBService:
                         "title": credit.get("title") or credit.get("name"),
                         "character": credit.get("character"),
                         "poster_path": credit.get("poster_path"),
+                        "vote_average": credit.get("vote_average"),
                         "role_type": "cast",
                     }
 
@@ -468,6 +469,7 @@ class TMDBService:
                         "job": credit.get("job"),
                         "department": credit.get("department"),
                         "poster_path": credit.get("poster_path"),
+                        "vote_average": credit.get("vote_average"),
                         "role_type": "crew",
                     }
 
@@ -508,3 +510,51 @@ class TMDBService:
         except Exception as e:
             logger.error(f"Failed to get filmography for person ID {person_id}: {e}")
             raise Exception(f"Failed to get person filmography: {str(e)}")
+
+    async def get_genres(self, media_type: str) -> List[Dict[str, Any]]:
+        """Get list of genres for movies or TV shows"""
+        try:
+            endpoint = f"/genre/{media_type}/list"
+            data = await self._make_request(endpoint, {})
+            return data.get("genres", [])
+        except Exception as e:
+            logger.error(f"Failed to get genres for {media_type}: {e}")
+            raise Exception(f"Failed to get genres: {str(e)}")
+
+    async def discover_media(
+        self,
+        media_type: str,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """Discover movies or TV shows with filters"""
+        try:
+            endpoint = f"/discover/{media_type}"
+            params = filters or {}
+
+            data = await self._make_request(endpoint, params)
+
+            # Format results similar to search
+            results = []
+            for item in data.get("results", []):
+                result = {
+                    "id": item["id"],
+                    "media_type": media_type,
+                    "title": item.get("title") or item.get("name"),
+                    "poster_path": item.get("poster_path"),
+                    "vote_average": item.get("vote_average"),
+                    "vote_count": item.get("vote_count"),
+                }
+
+                # Add year
+                if media_type == "movie":
+                    result["year"] = int(item["release_date"][:4]) if item.get("release_date") else None
+                else:
+                    result["year"] = int(item["first_air_date"][:4]) if item.get("first_air_date") else None
+
+                results.append(result)
+
+            return results
+
+        except Exception as e:
+            logger.error(f"Failed to discover {media_type} with filters {filters}: {e}")
+            raise Exception(f"Failed to discover {media_type}: {str(e)}")

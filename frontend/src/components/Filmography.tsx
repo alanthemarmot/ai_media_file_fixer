@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { StarIcon } from '@heroicons/react/24/solid';
 import type { PersonFilmography, FilmographyItem } from '../api';
 
 interface FilmographyProps {
@@ -107,7 +108,15 @@ export default function Filmography({ filmography, onItemSelect }: FilmographyPr
               </div>
             )}
             <span className="font-medium text-center text-sm line-clamp-2 text-gray-900 dark:text-gray-100">{item.title}</span>
-            {item.year && <span className="text-xs text-gray-500 dark:text-gray-400">{item.year}</span>}
+            <div className="flex items-center gap-2 text-xs">
+              {item.year && <span className="text-gray-500 dark:text-gray-400">{item.year}</span>}
+              {item.vote_average != null && item.vote_average > 0 && (
+                <div className="flex items-center gap-1 text-yellow-500">
+                  <StarIcon className="w-3 h-3" />
+                  <span className="font-medium">{item.vote_average.toFixed(1)}</span>
+                </div>
+              )}
+            </div>
             {item.character && (
               <span className="text-xs text-blue-600 dark:text-blue-400 text-center line-clamp-1">as {item.character}</span>
             )}

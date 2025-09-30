@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { StarIcon } from '@heroicons/react/24/solid';
 import type { SearchResult } from '../api';
 import PersonResultsList from './PersonResultsList';
 import '../components/IconLink.css';
@@ -9,7 +10,24 @@ interface ResultsListProps {
 }
 
 export default function ResultsList({ results, onSelect }: ResultsListProps) {
-  const [activeTab, setActiveTab] = useState<'tv' | 'movies' | 'people'>('tv');
+  const tvShows = results.filter(r => r.media_type === 'tv');
+  const movies = results.filter(r => r.media_type === 'movie');
+  const people = results.filter(r => r.media_type === 'person');
+
+  // Determine default tab based on which category has results
+  const getDefaultTab = (): 'tv' | 'movies' | 'people' => {
+    if (tvShows.length > 0) return 'tv';
+    if (movies.length > 0) return 'movies';
+    if (people.length > 0) return 'people';
+    return 'tv';
+  };
+
+  const [activeTab, setActiveTab] = useState<'tv' | 'movies' | 'people'>(getDefaultTab());
+
+  // Update active tab when results change
+  React.useEffect(() => {
+    setActiveTab(getDefaultTab());
+  }, [results]);
 
   if (results.length === 0) {
     return (
@@ -21,10 +39,6 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
       </div>
     );
   }
-
-  const tvShows = results.filter(r => r.media_type === 'tv');
-  const movies = results.filter(r => r.media_type === 'movie');
-  const people = results.filter(r => r.media_type === 'person');
 
   const renderResultGrid = (mediaItems: SearchResult[]) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -46,7 +60,15 @@ export default function ResultsList({ results, onSelect }: ResultsListProps) {
             </div>
           )}
           <span className="font-medium text-center text-lg text-gray-900 dark:text-gray-100">{result.title}</span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">{result.year}</span>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-500 dark:text-gray-400">{result.year}</span>
+            {result.vote_average != null && result.vote_average > 0 && (
+              <div className="flex items-center gap-1 text-yellow-500">
+                <StarIcon className="w-4 h-4" />
+                <span className="font-medium">{result.vote_average.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
         </button>
       ))}
     </div>
