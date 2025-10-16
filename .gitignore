@@ -2,6 +2,9 @@
 .env_copy
 backend/.env
 .claude
+.playwright-mcp/
+frontend/playwright-report/
+test-results/
 
 # Python cache files
 __pycache__/
